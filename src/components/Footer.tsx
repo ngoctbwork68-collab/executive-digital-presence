@@ -1,10 +1,17 @@
 import { Linkedin, Github, Twitter, Mail } from 'lucide-react';
 import { useLanguage, getBilingualContent } from '@/lib/i18n';
 import { useProfile } from '@/hooks/useProfile';
+import { useSetting } from '@/hooks/useSettings';
 
 const Footer = () => {
   const { language } = useLanguage();
   const { data: profile } = useProfile();
+  const { data: footerTaglineEn } = useSetting('footer_tagline_en');
+  const { data: footerTaglineVi } = useSetting('footer_tagline_vi');
+
+  const footerTagline = language === 'en' 
+    ? footerTaglineEn?.value_en 
+    : footerTaglineVi?.value_vi;
 
   return (
     <footer className="bg-muted/50 border-t border-border">
@@ -16,7 +23,7 @@ const Footer = () => {
               {profile?.name || 'Trần Bảo Ngọc'}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {profile ? getBilingualContent(profile, language, 'tagline') : ''}
+              {footerTagline || (profile ? getBilingualContent(profile, language, 'tagline') : '')}
             </p>
           </div>
 
