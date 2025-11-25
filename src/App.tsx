@@ -19,6 +19,7 @@ import ProfileManager from "./pages/admin/ProfileManager";
 import ProjectsManager from "./pages/admin/ProjectsManager";
 import SettingsManager from "./pages/admin/SettingsManager";
 import ActivitiesManager from "./pages/admin/ActivitiesManager";
+import ExperiencesManager from "./pages/admin/ExperiencesManager";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -77,6 +78,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <ActivitiesManager />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/experiences" 
+            element={
+              <ProtectedRoute>
+                <ExperiencesManager />
               </ProtectedRoute>
             } 
           />
