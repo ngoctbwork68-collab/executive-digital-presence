@@ -20,6 +20,7 @@ import ProjectsManager from "./pages/admin/ProjectsManager";
 import SettingsManager from "./pages/admin/SettingsManager";
 import ActivitiesManager from "./pages/admin/ActivitiesManager";
 import ExperiencesManager from "./pages/admin/ExperiencesManager";
+import BlogManager from "./pages/admin/BlogManager";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -86,6 +87,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <ExperiencesManager />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/blog" 
+            element={
+              <ProtectedRoute>
+                <BlogManager />
               </ProtectedRoute>
             } 
           />
