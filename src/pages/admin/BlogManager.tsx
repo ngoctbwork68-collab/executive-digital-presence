@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Plus, Pencil, Trash2, Eye, EyeOff, Tag as TagIcon } from 'lucide-react';
+import { MediaUpload } from '@/components/admin/MediaUpload';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import type { BlogPost, BlogPostInsert, BlogPostUpdate, BlogTag } from '@/lib/supabase/blog';
@@ -424,15 +425,12 @@ export default function BlogManager() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="featured_image_url">Featured Image URL</Label>
-                    <Input
-                      id="featured_image_url"
-                      value={formData.featured_image_url}
-                      onChange={(e) => setFormData({ ...formData, featured_image_url: e.target.value })}
-                      placeholder="https://example.com/image.jpg"
-                    />
-                  </div>
+                  <MediaUpload
+                    label="Featured Image"
+                    value={formData.featured_image_url || ''}
+                    onChange={(url) => setFormData({ ...formData, featured_image_url: url })}
+                    accept="image/*"
+                  />
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">

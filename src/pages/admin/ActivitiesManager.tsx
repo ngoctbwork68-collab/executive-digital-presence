@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Loader2, Plus, Pencil, Trash2, X } from 'lucide-react';
+import { MediaUpload } from '@/components/admin/MediaUpload';
 import { useNavigate } from 'react-router-dom';
 import {
   useAllActivities,
@@ -383,15 +384,12 @@ export default function ActivitiesManager() {
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="image_url">Image URL</Label>
-                <Input
-                  id="image_url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
+              <MediaUpload
+                label="Activity Image"
+                value={formData.image_url || ''}
+                onChange={(url) => setFormData({ ...formData, image_url: url })}
+                accept="image/*"
+              />
 
               <div className="space-y-4">
                 <div>

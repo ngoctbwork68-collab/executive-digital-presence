@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, Plus, Edit, Trash2, ArrowLeft, Eye, EyeOff, Star, Image as ImageIcon, X } from 'lucide-react';
+import { MediaUpload } from '@/components/admin/MediaUpload';
 import { toast } from 'sonner';
 import type { Project } from '@/lib/supabase/projects';
 
@@ -370,15 +371,12 @@ export default function ProjectsManager() {
                   </TabsContent>
 
                   <TabsContent value="media" className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="image_url">Featured Image URL</Label>
-                      <Input
-                        id="image_url"
-                        value={formData.image_url}
-                        onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
-                        placeholder="https://example.com/image.jpg"
-                      />
-                    </div>
+                    <MediaUpload
+                      label="Featured Image"
+                      value={formData.image_url || ''}
+                      onChange={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
+                      accept="image/*"
+                    />
 
                     <div className="space-y-2">
                       <Label>Gallery Images</Label>

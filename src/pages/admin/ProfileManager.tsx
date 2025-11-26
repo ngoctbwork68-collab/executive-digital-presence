@@ -6,13 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { MediaUpload } from '@/components/admin/MediaUpload';
 import { toast } from 'sonner';
 import { ArrowLeft, Save } from 'lucide-react';
 
 export default function ProfileManager() {
   const navigate = useNavigate();
   const { data: profile, isLoading } = useProfile();
-  const [uploading, setUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -58,24 +58,6 @@ export default function ProfileManager() {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    
-    const file = e.target.files[0];
-    setUploading(true);
-
-    try {
-      // For now, we'll use a placeholder. You can implement Supabase Storage later
-      const imageUrl = URL.createObjectURL(file);
-      handleInputChange('avatar_url', imageUrl);
-      toast.success('Image uploaded (local preview)');
-    } catch (error) {
-      toast.error('Failed to upload image');
-    } finally {
-      setUploading(false);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -129,12 +111,12 @@ export default function ProfileManager() {
           {/* Avatar */}
           <div className="bg-card border border-border rounded-lg p-6">
             <h2 className="font-display text-xl font-semibold mb-4">Avatar</h2>
-            <div className="flex items-center gap-4">
-              {formData.avatar_url && (
-                <img src={formData.avatar_url} alt="Avatar" className="w-24 h-24 rounded-full object-cover" />
-              )}
-              <Input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
-            </div>
+            <MediaUpload
+              label="Profile Avatar"
+              value={formData.avatar_url}
+              onChange={(url) => handleInputChange('avatar_url', url)}
+              accept="image/*"
+            />
           </div>
 
           {/* Basic Info */}

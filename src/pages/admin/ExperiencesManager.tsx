@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Switch } from '@/components/ui/switch';
 import { ArrowLeft, Plus, Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
+import { MediaUpload } from '@/components/admin/MediaUpload';
 import { toast } from 'sonner';
 import type { Experience, ExperienceInsert, ExperienceUpdate } from '@/lib/supabase/experiences';
 
@@ -368,15 +369,12 @@ export default function ExperiencesManager() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="image_url">Company Logo URL</Label>
-                  <Input
-                    id="image_url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    placeholder="https://example.com/logo.png"
-                  />
-                </div>
+                <MediaUpload
+                  label="Company Logo"
+                  value={formData.image_url || ''}
+                  onChange={(url) => setFormData({ ...formData, image_url: url })}
+                  accept="image/*"
+                />
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
