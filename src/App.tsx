@@ -21,6 +21,7 @@ import SettingsManager from "./pages/admin/SettingsManager";
 import ActivitiesManager from "./pages/admin/ActivitiesManager";
 import ExperiencesManager from "./pages/admin/ExperiencesManager";
 import BlogManager from "./pages/admin/BlogManager";
+import MediaLibrary from "./pages/admin/MediaLibrary";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -95,6 +96,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <BlogManager />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/media" 
+            element={
+              <ProtectedRoute>
+                <MediaLibrary />
               </ProtectedRoute>
             } 
           />

@@ -58,6 +58,12 @@ export default function AdminDashboard() {
           </div>
 
           <div className="bg-card border border-border rounded-lg p-6 hover:shadow-elegant transition-all">
+            <h2 className="font-display text-xl font-semibold mb-2">Media Library</h2>
+            <p className="text-muted-foreground mb-4">View and manage uploaded media</p>
+            <Button className="w-full" onClick={() => navigate('/admin/media')}>Manage</Button>
+          </div>
+
+          <div className="bg-card border border-border rounded-lg p-6 hover:shadow-elegant transition-all">
             <h2 className="font-display text-xl font-semibold mb-2">Settings</h2>
             <p className="text-muted-foreground mb-4">Configure footer and site settings</p>
             <Button className="w-full" onClick={() => navigate('/admin/settings')}>Manage</Button>
