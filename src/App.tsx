@@ -34,6 +34,7 @@ import BrandingManager from "./pages/admin/BrandingManager";
 import OrdersManager from "./pages/admin/OrdersManager";
 import CategoriesManager from "./pages/admin/CategoriesManager";
 import ChatbotManager from "./pages/admin/ChatbotManager";
+import SectionsOrderManager from "./pages/admin/SectionsOrderManager";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./components/admin/AdminLayout";
 import BackToTop from "./components/BackToTop";
@@ -82,6 +83,7 @@ const App = () => (
             <Route path="orders" element={<OrdersManager />} />
             <Route path="categories" element={<CategoriesManager />} />
             <Route path="chatbot" element={<ChatbotManager />} />
+            <Route path="sections-order" element={<SectionsOrderManager />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

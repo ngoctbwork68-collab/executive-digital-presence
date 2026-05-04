@@ -16,6 +16,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import CustomSections from '@/components/CustomSections';
 import RichContent from '@/components/RichContent';
+import { useHomeSectionsOrder, type HomeSectionId } from '@/hooks/useHomeSections';
 
 /* ── Scroll Reveal wrapper ── */
 const RevealSection = ({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) => {
@@ -43,6 +44,7 @@ const Home = () => {
   const showTestimonials = showTestimonialsSetting?.value !== 'false';
   const { data: showHeroButtonsSetting } = useSetting('show_hero_buttons');
   const showHeroButtons = showHeroButtonsSetting?.value !== 'false';
+  const { data: sectionsOrder } = useHomeSectionsOrder();
 
   /* ── Parallax state ── */
   const [scrollY, setScrollY] = useState(0);
@@ -165,251 +167,196 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ═══════════════ STATS ═══════════════ */}
-      {((experiences && experiences.length > 0) || (featuredProjects && featuredProjects.length > 0) || (featuredPosts && featuredPosts.length > 0)) && (
-        <section className="container mx-auto px-4 -mt-6 relative z-20">
-          <div ref={statsReveal.ref} className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { icon: Briefcase, value: experiences?.length || 0, label: language === 'en' ? 'Years Experience' : 'Năm kinh nghiệm', color: 'text-primary' },
-                { icon: TrendingUp, value: featuredProjects?.length || 0, label: language === 'en' ? 'Projects Completed' : 'Dự án hoàn thành', color: 'text-secondary' },
-                { icon: Users, value: featuredPosts?.length || 0, label: language === 'en' ? 'Articles Written' : 'Bài viết', color: 'text-primary' },
-              ].map((stat, i) => (
-                <Card
-                  key={i}
-                  className={`card-premium border-0 shadow-lg scroll-hidden ${statsReveal.isVisible ? 'scroll-visible' : ''}`}
-                  style={{ transitionDelay: `${i * 0.15}s` }}
-                >
-                  <CardContent className="p-6 flex items-center gap-4">
-                    <div className={`w-14 h-14 rounded-2xl bg-muted flex items-center justify-center ${stat.color}`}>
-                      <stat.icon size={24} />
-                    </div>
-                    <div>
-                      <p className="font-serif text-3xl font-bold">
-                        <CountUp end={stat.value} trigger={statsReveal.isVisible} />
-                      </p>
-                      <p className="text-sm text-muted-foreground">{stat.label}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ═══════════════ FEATURED PROJECTS ═══════════════ */}
-      {featuredProjects && featuredProjects.length > 0 && (
-        <section className="container mx-auto px-4 py-24">
-          <div className="max-w-6xl mx-auto">
-            <RevealSection>
-              <div className="flex items-end justify-between mb-12">
-                <div>
-                  <p className="text-sm font-medium text-secondary uppercase tracking-wider mb-2">
-                    {language === 'en' ? 'Portfolio' : 'Danh mục'}
-                  </p>
-                  <h2 className="font-serif text-3xl md:text-4xl font-bold">
-                    {language === 'en' ? 'Featured Projects' : 'Dự án nổi bật'}
-                  </h2>
-                </div>
-                <Button variant="ghost" className="hidden md:inline-flex text-primary" asChild>
-                  <Link to="/projects">
-                    {language === 'en' ? 'View All' : 'Xem tất cả'}
-                    <ArrowRight className="ml-1" size={16} />
-                  </Link>
-                </Button>
-              </div>
-            </RevealSection>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {featuredProjects.slice(0, 3).map((project, i) => (
-                <RevealSection key={project.id} delay={i * 0.12}>
-                  <Card className="card-premium overflow-hidden group border-0 shadow-md h-full">
-                    {project.image_url && (
-                      <div className="aspect-video overflow-hidden relative">
-                        <img
-                          src={project.image_url}
-                          alt={project.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      </div>
-                    )}
-                    <CardContent className="p-6">
-                      <h3 className="font-serif font-bold text-xl mb-2 group-hover:text-secondary transition-colors duration-300">{project.title}</h3>
-                      <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{project.description}</p>
-                      <Link
-                        to={`/projects/${project.slug}`}
-                        className="text-secondary font-medium text-sm inline-flex items-center gap-1 hover:gap-2 transition-all duration-300"
-                      >
-                        {language === 'en' ? 'View Project' : 'Xem chi tiết'}
-                        <ArrowRight size={16} />
-                      </Link>
-                    </CardContent>
-                  </Card>
-                </RevealSection>
-              ))}
-            </div>
-
-            <div className="text-center mt-10 md:hidden">
-              <Button variant="outline" asChild>
-                <Link to="/projects">{language === 'en' ? 'View All Projects' : 'Xem tất cả dự án'}</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ═══════════════ TESTIMONIALS ═══════════════ */}
-      {showTestimonials && testimonials && testimonials.length > 0 && (
-        <section className="py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-muted/30" />
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold-main)/0.3)] to-transparent" />
-
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-6xl mx-auto">
-              <RevealSection>
-                <div className="text-center mb-14">
-                  <p className="text-sm font-medium text-secondary uppercase tracking-wider mb-2">
-                    {language === 'en' ? 'Testimonials' : 'Nhận xét'}
-                  </p>
-                  <h2 className="font-serif text-3xl md:text-4xl font-bold">
-                    {language === 'en' ? 'What People Say' : 'Mọi người nói gì'}
-                  </h2>
-                </div>
-              </RevealSection>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {testimonials.map((t, i) => (
-                  <RevealSection key={t.id} delay={i * 0.15}>
-                    <Card className="card-premium border-0 shadow-md h-full relative overflow-hidden group">
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[hsl(var(--gold-dark))] via-[hsl(var(--gold-main))] to-[hsl(var(--gold-light))] opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-                      <CardContent className="p-8">
-                        <Quote size={32} className="text-secondary/30 mb-4" />
-                        <p className="text-foreground/80 leading-relaxed mb-6 italic">
-                          "{language === 'en' ? (t.quote_en || t.quote_vi) : t.quote_vi}"
-                        </p>
-                        <div className="flex items-center gap-3">
-                          {t.avatar_url ? (
-                            <img src={t.avatar_url} alt={t.name} className="w-12 h-12 rounded-full object-cover border-2 border-secondary/20" />
-                          ) : (
-                            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-2xl">👤</div>
-                          )}
-                          <div>
-                            <p className="font-serif font-bold text-sm">{t.name}</p>
-                            <p className="text-xs text-muted-foreground">{language === 'en' ? (t.role_en || t.role_vi) : t.role_vi}</p>
-                          </div>
+      {(() => {
+        const sectionMap: Record<HomeSectionId, React.ReactNode> = {
+          stats: ((experiences && experiences.length > 0) || (featuredProjects && featuredProjects.length > 0) || (featuredPosts && featuredPosts.length > 0)) ? (
+            <section key="stats" className="container mx-auto px-4 -mt-6 relative z-20">
+              <div ref={statsReveal.ref} className="max-w-4xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[
+                    { icon: Briefcase, value: experiences?.length || 0, label: language === 'en' ? 'Years Experience' : 'Năm kinh nghiệm', color: 'text-primary' },
+                    { icon: TrendingUp, value: featuredProjects?.length || 0, label: language === 'en' ? 'Projects Completed' : 'Dự án hoàn thành', color: 'text-secondary' },
+                    { icon: Users, value: featuredPosts?.length || 0, label: language === 'en' ? 'Articles Written' : 'Bài viết', color: 'text-primary' },
+                  ].map((stat, i) => (
+                    <Card key={i} className={`card-premium border-0 shadow-lg scroll-hidden ${statsReveal.isVisible ? 'scroll-visible' : ''}`} style={{ transitionDelay: `${i * 0.15}s` }}>
+                      <CardContent className="p-6 flex items-center gap-4">
+                        <div className={`w-14 h-14 rounded-2xl bg-muted flex items-center justify-center ${stat.color}`}>
+                          <stat.icon size={24} />
+                        </div>
+                        <div>
+                          <p className="font-serif text-3xl font-bold"><CountUp end={stat.value} trigger={statsReveal.isVisible} /></p>
+                          <p className="text-sm text-muted-foreground">{stat.label}</p>
                         </div>
                       </CardContent>
                     </Card>
-                  </RevealSection>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold-main)/0.3)] to-transparent" />
-        </section>
-      )}
-
-      {/* ═══════════════ LATEST BLOG POSTS ═══════════════ */}
-      {featuredPosts && featuredPosts.length > 0 && (
-        <section className="py-24">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <RevealSection>
-                <div className="flex items-end justify-between mb-12">
-                  <div>
-                    <p className="text-sm font-medium text-secondary uppercase tracking-wider mb-2">Blog</p>
-                    <h2 className="font-serif text-3xl md:text-4xl font-bold">
-                      {language === 'en' ? 'Latest Insights' : 'Bài viết mới nhất'}
-                    </h2>
-                  </div>
-                  <Button variant="ghost" className="hidden md:inline-flex text-primary" asChild>
-                    <Link to="/blog">
-                      {language === 'en' ? 'View All' : 'Xem tất cả'}
-                      <ArrowRight className="ml-1" size={16} />
-                    </Link>
-                  </Button>
+                  ))}
                 </div>
-              </RevealSection>
+              </div>
+            </section>
+          ) : null,
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {featuredPosts.slice(0, 3).map((post, i) => (
-                  <RevealSection key={post.id} delay={i * 0.12}>
-                    <Link to={`/blog/${post.slug}`} className="group block h-full">
-                      <Card className="card-premium h-full border-0 shadow-md overflow-hidden">
-                        {post.image_url && (
-                          <div className="aspect-video overflow-hidden">
-                            <img src={post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+          projects: featuredProjects && featuredProjects.length > 0 ? (
+            <section key="projects" className="container mx-auto px-4 py-24">
+              <div className="max-w-6xl mx-auto">
+                <RevealSection>
+                  <div className="flex items-end justify-between mb-12">
+                    <div>
+                      <p className="text-sm font-medium text-secondary uppercase tracking-wider mb-2">{language === 'en' ? 'Portfolio' : 'Danh mục'}</p>
+                      <h2 className="font-serif text-3xl md:text-4xl font-bold">{language === 'en' ? 'Featured Projects' : 'Dự án nổi bật'}</h2>
+                    </div>
+                    <Button variant="ghost" className="hidden md:inline-flex text-primary" asChild>
+                      <Link to="/projects">{language === 'en' ? 'View All' : 'Xem tất cả'}<ArrowRight className="ml-1" size={16} /></Link>
+                    </Button>
+                  </div>
+                </RevealSection>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  {featuredProjects.slice(0, 3).map((project, i) => (
+                    <RevealSection key={project.id} delay={i * 0.12}>
+                      <Card className="card-premium overflow-hidden group border-0 shadow-md h-full">
+                        {project.image_url && (
+                          <div className="aspect-video overflow-hidden relative">
+                            <img src={project.image_url} alt={project.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                           </div>
                         )}
                         <CardContent className="p-6">
-                          <p className="text-xs text-muted-foreground mb-2">
-                            {new Date(post.created_at).toLocaleDateString(language === 'en' ? 'en-US' : 'vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}
-                          </p>
-                          <h3 className="font-serif font-bold text-lg mb-2 group-hover:text-secondary transition-colors duration-300 line-clamp-2">{post.title}</h3>
-                          {post.excerpt && (
-                            <p className="text-muted-foreground text-sm line-clamp-2">{post.excerpt}</p>
-                          )}
+                          <h3 className="font-serif font-bold text-xl mb-2 group-hover:text-secondary transition-colors duration-300">{project.title}</h3>
+                          <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{project.description}</p>
+                          <Link to={`/projects/${project.slug}`} className="text-secondary font-medium text-sm inline-flex items-center gap-1 hover:gap-2 transition-all duration-300">
+                            {language === 'en' ? 'View Project' : 'Xem chi tiết'}<ArrowRight size={16} />
+                          </Link>
                         </CardContent>
                       </Card>
-                    </Link>
+                    </RevealSection>
+                  ))}
+                </div>
+                <div className="text-center mt-10 md:hidden">
+                  <Button variant="outline" asChild><Link to="/projects">{language === 'en' ? 'View All Projects' : 'Xem tất cả dự án'}</Link></Button>
+                </div>
+              </div>
+            </section>
+          ) : null,
+
+          testimonials: showTestimonials && testimonials && testimonials.length > 0 ? (
+            <section key="testimonials" className="py-24 relative overflow-hidden">
+              <div className="absolute inset-0 bg-muted/30" />
+              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold-main)/0.3)] to-transparent" />
+              <div className="container mx-auto px-4 relative z-10">
+                <div className="max-w-6xl mx-auto">
+                  <RevealSection>
+                    <div className="text-center mb-14">
+                      <p className="text-sm font-medium text-secondary uppercase tracking-wider mb-2">{language === 'en' ? 'Testimonials' : 'Nhận xét'}</p>
+                      <h2 className="font-serif text-3xl md:text-4xl font-bold">{language === 'en' ? 'What People Say' : 'Mọi người nói gì'}</h2>
+                    </div>
                   </RevealSection>
-                ))}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {testimonials.map((t, i) => (
+                      <RevealSection key={t.id} delay={i * 0.15}>
+                        <Card className="card-premium border-0 shadow-md h-full relative overflow-hidden group">
+                          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[hsl(var(--gold-dark))] via-[hsl(var(--gold-main))] to-[hsl(var(--gold-light))] opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                          <CardContent className="p-8">
+                            <Quote size={32} className="text-secondary/30 mb-4" />
+                            <p className="text-foreground/80 leading-relaxed mb-6 italic">"{language === 'en' ? (t.quote_en || t.quote_vi) : t.quote_vi}"</p>
+                            <div className="flex items-center gap-3">
+                              {t.avatar_url ? (
+                                <img src={t.avatar_url} alt={t.name} className="w-12 h-12 rounded-full object-cover border-2 border-secondary/20" />
+                              ) : (
+                                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-2xl">👤</div>
+                              )}
+                              <div>
+                                <p className="font-serif font-bold text-sm">{t.name}</p>
+                                <p className="text-xs text-muted-foreground">{language === 'en' ? (t.role_en || t.role_vi) : t.role_vi}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </RevealSection>
+                    ))}
+                  </div>
+                </div>
               </div>
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(var(--gold-main)/0.3)] to-transparent" />
+            </section>
+          ) : null,
 
-              <div className="text-center mt-10 md:hidden">
-                <Button variant="outline" asChild>
-                  <Link to="/blog">{language === 'en' ? 'View All Articles' : 'Xem tất cả bài viết'}</Link>
-                </Button>
+          blog: featuredPosts && featuredPosts.length > 0 ? (
+            <section key="blog" className="py-24">
+              <div className="container mx-auto px-4">
+                <div className="max-w-6xl mx-auto">
+                  <RevealSection>
+                    <div className="flex items-end justify-between mb-12">
+                      <div>
+                        <p className="text-sm font-medium text-secondary uppercase tracking-wider mb-2">Blog</p>
+                        <h2 className="font-serif text-3xl md:text-4xl font-bold">{language === 'en' ? 'Latest Insights' : 'Bài viết mới nhất'}</h2>
+                      </div>
+                      <Button variant="ghost" className="hidden md:inline-flex text-primary" asChild>
+                        <Link to="/blog">{language === 'en' ? 'View All' : 'Xem tất cả'}<ArrowRight className="ml-1" size={16} /></Link>
+                      </Button>
+                    </div>
+                  </RevealSection>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {featuredPosts.slice(0, 3).map((post, i) => (
+                      <RevealSection key={post.id} delay={i * 0.12}>
+                        <Link to={`/blog/${post.slug}`} className="group block h-full">
+                          <Card className="card-premium h-full border-0 shadow-md overflow-hidden">
+                            {post.image_url && (
+                              <div className="aspect-video overflow-hidden">
+                                <img src={post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                              </div>
+                            )}
+                            <CardContent className="p-6">
+                              <p className="text-xs text-muted-foreground mb-2">
+                                {new Date(post.created_at).toLocaleDateString(language === 'en' ? 'en-US' : 'vi-VN', { year: 'numeric', month: 'long', day: 'numeric' })}
+                              </p>
+                              <h3 className="font-serif font-bold text-lg mb-2 group-hover:text-secondary transition-colors duration-300 line-clamp-2">{post.title}</h3>
+                              {post.excerpt && (<p className="text-muted-foreground text-sm line-clamp-2">{post.excerpt}</p>)}
+                            </CardContent>
+                          </Card>
+                        </Link>
+                      </RevealSection>
+                    ))}
+                  </div>
+                  <div className="text-center mt-10 md:hidden">
+                    <Button variant="outline" asChild><Link to="/blog">{language === 'en' ? 'View All Articles' : 'Xem tất cả bài viết'}</Link></Button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </section>
-      )}
+            </section>
+          ) : null,
 
-      {/* ═══════════════ CTA ═══════════════ */}
-      <section className="container mx-auto px-4 py-24">
-        <RevealSection>
-          <div className="max-w-4xl mx-auto">
-            <Card className="bg-navy-gradient text-primary-foreground border-0 overflow-hidden relative">
-              {/* Parallax orbs in CTA */}
-              <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-                <div
-                  className="orb-gold w-48 h-48 -top-10 -right-10 animate-pulse-glow"
-                  style={{ transform: `translateY(${scrollY * -0.05}px)` }}
-                />
-                <div
-                  className="orb-gold w-32 h-32 -bottom-8 -left-8 animate-pulse-glow"
-                  style={{ animationDelay: '1.5s', transform: `translateY(${scrollY * 0.03}px)` }}
-                />
-              </div>
-              <CardContent className="p-12 md:p-20 text-center relative z-10">
-                <h2 className="font-serif text-3xl md:text-5xl font-bold mb-5">
-                  {language === 'en' ? 'Ready to collaborate?' : 'Sẵn sàng hợp tác?'}
-                </h2>
-                <p className="text-lg opacity-70 mb-10 max-w-xl mx-auto leading-relaxed">
-                  {language === 'en'
-                    ? "Let's discuss how we can create value together."
-                    : 'Hãy cùng thảo luận về cách chúng ta có thể tạo giá trị cùng nhau.'}
-                </p>
-                <Button size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full px-10 shadow-gold gold-shine text-base" asChild>
-                  <Link to="/contact">
-                    {language === 'en' ? 'Get in Touch' : 'Liên hệ ngay'}
-                    <ArrowRight className="ml-2" size={20} />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </RevealSection>
-      </section>
+          cta: (
+            <section key="cta" className="container mx-auto px-4 py-24">
+              <RevealSection>
+                <div className="max-w-4xl mx-auto">
+                  <Card className="bg-navy-gradient text-primary-foreground border-0 overflow-hidden relative">
+                    <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+                      <div className="orb-gold w-48 h-48 -top-10 -right-10 animate-pulse-glow" style={{ transform: `translateY(${scrollY * -0.05}px)` }} />
+                      <div className="orb-gold w-32 h-32 -bottom-8 -left-8 animate-pulse-glow" style={{ animationDelay: '1.5s', transform: `translateY(${scrollY * 0.03}px)` }} />
+                    </div>
+                    <CardContent className="p-12 md:p-20 text-center relative z-10">
+                      <h2 className="font-serif text-3xl md:text-5xl font-bold mb-5">{language === 'en' ? 'Ready to collaborate?' : 'Sẵn sàng hợp tác?'}</h2>
+                      <p className="text-lg opacity-70 mb-10 max-w-xl mx-auto leading-relaxed">
+                        {language === 'en' ? "Let's discuss how we can create value together." : 'Hãy cùng thảo luận về cách chúng ta có thể tạo giá trị cùng nhau.'}
+                      </p>
+                      <Button size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full px-10 shadow-gold gold-shine text-base" asChild>
+                        <Link to="/contact">{language === 'en' ? 'Get in Touch' : 'Liên hệ ngay'}<ArrowRight className="ml-2" size={20} /></Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              </RevealSection>
+            </section>
+          ),
 
-      <CustomSections page="home" />
+          custom: <CustomSections key="custom" page="home" />,
+        };
+        return (sectionsOrder || []).map(id => sectionMap[id]);
+      })()}
+
       <Footer />
     </div>
   );
 };
 
 export default Home;
+
