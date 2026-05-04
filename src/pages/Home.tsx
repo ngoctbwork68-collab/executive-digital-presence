@@ -16,7 +16,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import CustomSections from '@/components/CustomSections';
 import RichContent from '@/components/RichContent';
-import { useHomeSectionsOrder, type HomeSectionId } from '@/hooks/useHomeSections';
+import { useHomeSectionsOrder, useHomeSectionsVisibility, type HomeSectionId } from '@/hooks/useHomeSections';
 
 /* ── Scroll Reveal wrapper ── */
 const RevealSection = ({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) => {
@@ -45,6 +45,7 @@ const Home = () => {
   const { data: showHeroButtonsSetting } = useSetting('show_hero_buttons');
   const showHeroButtons = showHeroButtonsSetting?.value !== 'false';
   const { data: sectionsOrder } = useHomeSectionsOrder();
+  const { data: sectionsVisibility } = useHomeSectionsVisibility();
 
   /* ── Parallax state ── */
   const [scrollY, setScrollY] = useState(0);
@@ -350,7 +351,7 @@ const Home = () => {
 
           custom: <CustomSections key="custom" page="home" />,
         };
-        return (sectionsOrder || []).map(id => sectionMap[id]);
+        return (sectionsOrder || []).filter(id => sectionsVisibility?.[id] !== false).map(id => sectionMap[id]);
       })()}
 
       <Footer />
