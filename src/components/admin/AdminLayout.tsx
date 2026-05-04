@@ -8,7 +8,7 @@ import {
   User, Briefcase, FolderOpen, Activity, FileText,
   Image, Settings, LogOut, LayoutDashboard, GraduationCap,
   Sun, Moon, Menu, X, ChevronRight, Blocks, ShoppingBag, Ticket, Quote, MessageCircle, BookOpen,
-  Sparkles, Package, Tags, Bot
+  Sparkles, Package, Tags, Bot, LayoutGrid
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +25,7 @@ const menuGroups = [
     items: [
       { path: '/admin/profile', icon: User, label: 'Hồ sơ' },
       { path: '/admin/branding', icon: Sparkles, label: 'Trang & Branding' },
+      { path: '/admin/sections-order', icon: LayoutGrid, label: 'Sắp xếp Section' },
       { path: '/admin/experiences', icon: Briefcase, label: 'Kinh nghiệm' },
       { path: '/admin/education', icon: GraduationCap, label: 'Học vấn' },
       { path: '/admin/projects', icon: FolderOpen, label: 'Dự án' },
