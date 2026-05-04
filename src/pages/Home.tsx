@@ -351,7 +351,7 @@ const Home = () => {
 
           custom: <CustomSections key="custom" page="home" />,
         };
-        return (sectionsOrder || []).map(id => sectionMap[id]);
+        return (sectionsOrder || []).filter(id => sectionsVisibility?.[id] !== false).map(id => sectionMap[id]);
       })()}
 
       <Footer />
