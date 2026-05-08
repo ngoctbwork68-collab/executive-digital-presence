@@ -13,18 +13,27 @@ async function fetchPortfolioContext(): Promise<string> {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const [heroRes, aboutRes, expRes, projRes, eduRes, skillsRes, contactRes, trainingRes] = await Promise.all([
+    const [heroRes, aboutRes, expRes, projRes, eduRes, skillsRes, contactRes, trainingRes, blogRes, prodRes, testRes, actRes, socialRes, settingsRes] = await Promise.all([
       supabase.from("hero_section").select("name, title, quote").maybeSingle(),
       supabase.from("about_section").select("headline, description").maybeSingle(),
       supabase.from("experiences").select("title, company, year, description, achievements, location").order("sort_order"),
-      supabase.from("projects").select("title, description, category, technologies").order("sort_order").limit(10),
+      supabase.from("projects").select("title, description, category, technologies, link").order("sort_order").limit(15),
       supabase.from("education").select("degree, institution, year, field, achievements").order("sort_order"),
       supabase.from("skills").select("name").order("sort_order"),
       supabase.from("contacts").select("email, phone, location").maybeSingle(),
       supabase.from("chatbot_training").select("question, answer, language").eq("active", true).order("priority", { ascending: false }),
+      supabase.from("blogs").select("title, excerpt, slug").eq("published", true).order("created_at", { ascending: false }).limit(10),
+      supabase.from("products").select("name, description, price, product_type, slug").eq("published", true).order("sort_order").limit(20),
+      supabase.from("testimonials").select("name, role_vi, role_en, quote_vi, quote_en").eq("published", true).limit(10),
+      supabase.from("activities").select("title, description, date, location, category").eq("published", true).order("sort_order").limit(10),
+      supabase.from("social_links").select("provider, url").order("sort_order"),
+      supabase.from("settings").select("key, value").in("key", ["site_name", "footer_tagline"]),
     ]);
 
     const parts: string[] = [];
+    const settingsMap = Object.fromEntries((settingsRes.data || []).map(s => [s.key, s.value]));
+
+    if (settingsMap.site_name) parts.push(`# Tên website\n${settingsMap.site_name}${settingsMap.footer_tagline ? ` — ${settingsMap.footer_tagline}` : ''}`);
 
     if (heroRes.data) {
       parts.push(`# Thông tin chủ portfolio\nTên: ${heroRes.data.name}\nChức danh: ${heroRes.data.title}\nSlogan: ${heroRes.data.quote}`);
@@ -42,7 +51,7 @@ async function fetchPortfolioContext(): Promise<string> {
 
     if (projRes.data?.length) {
       parts.push(`# Dự án\n${projRes.data.map(p =>
-        `- ${p.title} (${p.category}): ${p.description}${p.technologies?.length ? ` | Công nghệ: ${p.technologies.join(', ')}` : ''}`
+        `- ${p.title} (${p.category}): ${p.description}${p.technologies?.length ? ` | Công nghệ: ${p.technologies.join(', ')}` : ''}${p.link ? ` | Link: ${p.link}` : ''}`
       ).join('\n')}`);
     }
 
@@ -56,13 +65,41 @@ async function fetchPortfolioContext(): Promise<string> {
       parts.push(`# Kỹ năng\n${skillsRes.data.map(s => s.name).join(', ')}`);
     }
 
+    if (actRes.data?.length) {
+      parts.push(`# Hoạt động / Sự kiện\n${actRes.data.map(a =>
+        `- ${a.title}${a.date ? ` (${a.date})` : ''}${a.location ? ` - ${a.location}` : ''}${a.category ? ` [${a.category}]` : ''}${a.description ? `: ${a.description}` : ''}`
+      ).join('\n')}`);
+    }
+
+    if (blogRes.data?.length) {
+      parts.push(`# Bài viết blog\n${blogRes.data.map(b =>
+        `- ${b.title}${b.excerpt ? `: ${b.excerpt}` : ''} (/blog/${b.slug})`
+      ).join('\n')}`);
+    }
+
+    if (prodRes.data?.length) {
+      parts.push(`# Sản phẩm / Dịch vụ trong cửa hàng\n${prodRes.data.map(p =>
+        `- ${p.name} [${p.product_type}] - ${Number(p.price).toLocaleString('vi-VN')}₫${p.description ? `: ${p.description}` : ''} (/store/${p.slug})`
+      ).join('\n')}`);
+    }
+
+    if (testRes.data?.length) {
+      parts.push(`# Đánh giá khách hàng\n${testRes.data.map(t =>
+        `- ${t.name} (${t.role_vi || t.role_en || ''}): "${t.quote_vi || t.quote_en}"`
+      ).join('\n')}`);
+    }
+
     if (contactRes.data) {
       const c = contactRes.data;
       parts.push(`# Liên hệ\n${c.email ? `Email: ${c.email}` : ''}${c.phone ? ` | SĐT: ${c.phone}` : ''}${c.location ? ` | Địa chỉ: ${c.location}` : ''}`);
     }
 
+    if (socialRes.data?.length) {
+      parts.push(`# Mạng xã hội\n${socialRes.data.map(s => `- ${s.provider}: ${s.url}`).join('\n')}`);
+    }
+
     if (trainingRes.data?.length) {
-      parts.push(`# FAQ đã huấn luyện\n${trainingRes.data.map(t => `Q: ${t.question}\nA: ${t.answer}`).join('\n\n')}`);
+      parts.push(`# FAQ đã huấn luyện (ưu tiên cao nhất)\n${trainingRes.data.map(t => `Q: ${t.question}\nA: ${t.answer}`).join('\n\n')}`);
     }
 
     return parts.join('\n\n');
@@ -83,28 +120,30 @@ serve(async (req) => {
     const portfolioContext = await fetchPortfolioContext();
 
     const systemPrompt = language === "vi"
-      ? `Bạn là trợ lý AI thông minh của portfolio cá nhân. Dưới đây là thông tin chi tiết về chủ portfolio:
+      ? `Bạn là trợ lý AI thông minh của portfolio cá nhân. Dưới đây là TOÀN BỘ dữ liệu thực tế từ database (cập nhật trực tiếp):
 
 ${portfolioContext}
 
-Hướng dẫn:
-- Trả lời ngắn gọn, chuyên nghiệp, thân thiện bằng tiếng Việt
-- Sử dụng thông tin ở trên để trả lời chính xác các câu hỏi
-- Nếu câu hỏi không liên quan đến portfolio, vẫn trả lời lịch sự nhưng gợi ý quay lại chủ đề portfolio
-- Nếu không biết câu trả lời chính xác, gợi ý liên hệ trực tiếp qua trang Liên hệ
-- Giữ câu trả lời dưới 200 từ
-- Có thể dùng emoji phù hợp để tạo sự thân thiện`
-      : `You are a smart AI assistant for a personal portfolio. Here is detailed information about the portfolio owner:
+Hướng dẫn QUAN TRỌNG:
+- Trả lời bằng tiếng Việt, chuyên nghiệp, ấm áp, dễ hiểu
+- LUÔN ưu tiên dùng dữ liệu thật ở trên — KHÔNG bịa thông tin
+- Nếu user hỏi về dự án/sản phẩm/blog/hoạt động cụ thể, trích chính xác tên + chi tiết và kèm link nếu có
+- Nếu FAQ đã huấn luyện có câu trả lời sát, dùng nguyên văn câu trả lời đó
+- Nếu thông tin không có trong dữ liệu, nói thẳng "Tôi chưa có thông tin này" và mời liên hệ qua trang /contact
+- Trình bày dùng markdown gọn (danh sách, bold), tối đa ~250 từ
+- Có thể dùng emoji phù hợp 🌟`
+      : `You are a smart AI assistant for a personal portfolio. Below is the COMPLETE real-time data from the database:
 
 ${portfolioContext}
 
-Guidelines:
-- Answer concisely, professionally, and friendly in English
-- Use the information above to answer questions accurately
-- If the question isn't about the portfolio, still respond politely but suggest returning to portfolio topics
-- If you don't know the exact answer, suggest contacting directly via the Contact page
-- Keep answers under 200 words
-- Use appropriate emojis for friendliness`;
+IMPORTANT guidelines:
+- Reply in English, professional and friendly
+- ALWAYS use the real data above — DO NOT make things up
+- For specific project/product/blog/activity questions, quote exact name + details and include link if available
+- If a trained FAQ matches, use that answer verbatim
+- If info isn't in the data, say "I don't have that info yet" and invite contact via /contact
+- Use concise markdown (lists, bold), max ~250 words
+- Use appropriate emojis 🌟`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

@@ -3,6 +3,8 @@ import { MessageCircle, X, Send, Bot, User, Sparkles, RotateCcw, ChevronDown } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/lib/i18n';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
@@ -11,6 +13,8 @@ interface Message {
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+
+const APPEARANCE_KEYS = ['chatbot_avatar_url', 'chatbot_name_vi', 'chatbot_name_en', 'chatbot_greeting_vi', 'chatbot_greeting_en'];
 
 async function streamChat({
   messages,
@@ -101,6 +105,22 @@ const ChatbotWidget = () => {
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const { data: appearance } = useQuery({
+    queryKey: ['chatbot_appearance_public'],
+    queryFn: async () => {
+      const { data } = await supabase.from('settings').select('key, value').in('key', APPEARANCE_KEYS);
+      const map: Record<string, string> = {};
+      (data || []).forEach((r: any) => { map[r.key] = r.value; });
+      return map;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const botAvatar = appearance?.chatbot_avatar_url || '';
+  const botName = language === 'en'
+    ? (appearance?.chatbot_name_en || 'AI Assistant')
+    : (appearance?.chatbot_name_vi || 'Trợ lý AI');
+
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
@@ -164,9 +184,13 @@ const ChatbotWidget = () => {
     setMessages([{ role: 'assistant', content: getGreeting() }]);
   };
 
-  const getGreeting = () => language === 'en'
-    ? "👋 Hi! I'm the AI portfolio assistant. I know all about the portfolio owner's skills, experience, projects, and education. Ask me anything!"
-    : "👋 Xin chào! Tôi là trợ lý AI portfolio. Tôi biết rõ về kỹ năng, kinh nghiệm, dự án và học vấn của chủ portfolio. Hỏi tôi bất cứ điều gì!";
+  const getGreeting = () => {
+    const custom = language === 'en' ? appearance?.chatbot_greeting_en : appearance?.chatbot_greeting_vi;
+    if (custom?.trim()) return custom;
+    return language === 'en'
+      ? "👋 Hi! I'm the AI portfolio assistant. I know all about the portfolio owner's skills, experience, projects, and education. Ask me anything!"
+      : "👋 Xin chào! Tôi là trợ lý AI portfolio. Tôi biết rõ về kỹ năng, kinh nghiệm, dự án và học vấn của chủ portfolio. Hỏi tôi bất cứ điều gì!";
+  };
 
   const showSuggestions = messages.length <= 1;
 
@@ -194,14 +218,16 @@ const ChatbotWidget = () => {
           {/* Header */}
           <div className="bg-primary text-primary-foreground px-4 py-3 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-full bg-secondary/20 flex items-center justify-center relative">
-                <Sparkles size={16} className="text-secondary" />
+              <div className="w-9 h-9 rounded-full bg-secondary/20 flex items-center justify-center relative overflow-hidden">
+                {botAvatar ? (
+                  <img src={botAvatar} alt={botName} className="w-full h-full object-cover" />
+                ) : (
+                  <Sparkles size={16} className="text-secondary" />
+                )}
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-primary" />
               </div>
               <div>
-                <span className="font-semibold text-sm block leading-tight">
-                  {language === 'en' ? 'AI Assistant' : 'Trợ lý AI'}
-                </span>
+                <span className="font-semibold text-sm block leading-tight">{botName}</span>
                 <span className="text-[10px] opacity-60">
                   {loading ? (language === 'en' ? 'Typing...' : 'Đang trả lời...') : 'Online'}
                 </span>
@@ -230,8 +256,8 @@ const ChatbotWidget = () => {
                 style={{ animationDelay: `${Math.min(i * 0.05, 0.3)}s`, animationFillMode: 'both' }}
               >
                 {msg.role === 'assistant' && (
-                  <div className="w-7 h-7 rounded-full bg-secondary/20 flex items-center justify-center shrink-0 mt-0.5">
-                    <Bot size={14} className="text-secondary" />
+                  <div className="w-7 h-7 rounded-full bg-secondary/20 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
+                    {botAvatar ? <img src={botAvatar} alt="" className="w-full h-full object-cover" /> : <Bot size={14} className="text-secondary" />}
                   </div>
                 )}
                 <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
@@ -256,8 +282,8 @@ const ChatbotWidget = () => {
             {/* Typing indicator */}
             {loading && messages[messages.length - 1]?.role !== 'assistant' && (
               <div className="flex gap-2 items-start animate-fade-in">
-                <div className="w-7 h-7 rounded-full bg-secondary/20 flex items-center justify-center">
-                  <Bot size={14} className="text-secondary" />
+                <div className="w-7 h-7 rounded-full bg-secondary/20 flex items-center justify-center overflow-hidden">
+                  {botAvatar ? <img src={botAvatar} alt="" className="w-full h-full object-cover" /> : <Bot size={14} className="text-secondary" />}
                 </div>
                 <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3">
                   <div className="flex gap-1.5">

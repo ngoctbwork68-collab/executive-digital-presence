@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,10 +9,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { MediaPicker } from '@/components/admin/MediaPicker';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Bot, MessageCircleQuestion } from 'lucide-react';
+import { Plus, Pencil, Trash2, Bot, MessageCircleQuestion, Image as ImageIcon, Save, X } from 'lucide-react';
 
 const empty = { question: '', answer: '', keywords: '', language: 'vi', priority: 0, active: true };
+
+const APPEARANCE_KEYS = ['chatbot_avatar_url', 'chatbot_name_vi', 'chatbot_name_en', 'chatbot_greeting_vi', 'chatbot_greeting_en'] as const;
+type AppearanceKey = typeof APPEARANCE_KEYS[number];
 
 export default function ChatbotManager() {
   const qc = useQueryClient();
@@ -23,6 +27,51 @@ export default function ChatbotManager() {
       return data || [];
     },
   });
+
+  const { data: appearance } = useQuery({
+    queryKey: ['chatbot_appearance'],
+    queryFn: async () => {
+      const { data } = await supabase.from('settings').select('key, value').in('key', APPEARANCE_KEYS as any);
+      const map: Record<string, string> = {};
+      (data || []).forEach((r: any) => { map[r.key] = r.value; });
+      return map;
+    },
+  });
+
+  const [appForm, setAppForm] = useState<Record<AppearanceKey, string>>({
+    chatbot_avatar_url: '', chatbot_name_vi: '', chatbot_name_en: '',
+    chatbot_greeting_vi: '', chatbot_greeting_en: '',
+  });
+  const [appLoaded, setAppLoaded] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [savingApp, setSavingApp] = useState(false);
+
+  if (appearance && !appLoaded) {
+    setAppForm({
+      chatbot_avatar_url: appearance.chatbot_avatar_url || '',
+      chatbot_name_vi: appearance.chatbot_name_vi || 'Trợ lý AI',
+      chatbot_name_en: appearance.chatbot_name_en || 'AI Assistant',
+      chatbot_greeting_vi: appearance.chatbot_greeting_vi || '',
+      chatbot_greeting_en: appearance.chatbot_greeting_en || '',
+    });
+    setAppLoaded(true);
+  }
+
+  const saveAppearance = async () => {
+    setSavingApp(true);
+    try {
+      const rows = APPEARANCE_KEYS.map(k => ({ key: k, value: appForm[k] || '' }));
+      const { error } = await supabase.from('settings').upsert(rows, { onConflict: 'key' });
+      if (error) throw error;
+      toast.success('Đã lưu giao diện chatbot');
+      qc.invalidateQueries({ queryKey: ['chatbot_appearance'] });
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setSavingApp(false);
+    }
+  };
+
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState(empty);
@@ -72,6 +121,71 @@ export default function ChatbotManager() {
           <p className="text-sm text-muted-foreground">Q&A tùy chỉnh để chatbot trả lời chính xác hơn</p>
         </div>
         <Button onClick={openCreate}><Plus className="w-4 h-4 mr-2" />Thêm Q&A</Button>
+      </div>
+
+      {/* Appearance */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg"><Bot className="w-5 h-5" /> Giao diện Chatbot</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-start gap-4">
+            <div className="shrink-0">
+              <Label className="mb-2 block">Ảnh đại diện</Label>
+              <div className="w-24 h-24 rounded-2xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden relative group">
+                {appForm.chatbot_avatar_url ? (
+                  <img src={appForm.chatbot_avatar_url} alt="Chatbot avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <Bot className="w-10 h-10 text-muted-foreground/40" />
+                )}
+              </div>
+              <div className="flex gap-1 mt-2">
+                <Button type="button" variant="outline" size="sm" onClick={() => setPickerOpen(true)}>
+                  <ImageIcon className="w-3.5 h-3.5 mr-1" /> Chọn
+                </Button>
+                {appForm.chatbot_avatar_url && (
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setAppForm(p => ({ ...p, chatbot_avatar_url: '' }))}>
+                    <X className="w-3.5 h-3.5" />
+                  </Button>
+                )}
+              </div>
+            </div>
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <Label>Tên chatbot (VI)</Label>
+                <Input value={appForm.chatbot_name_vi} onChange={e => setAppForm(p => ({ ...p, chatbot_name_vi: e.target.value }))} placeholder="Trợ lý AI" />
+              </div>
+              <div>
+                <Label>Tên chatbot (EN)</Label>
+                <Input value={appForm.chatbot_name_en} onChange={e => setAppForm(p => ({ ...p, chatbot_name_en: e.target.value }))} placeholder="AI Assistant" />
+              </div>
+              <div className="md:col-span-2">
+                <Label>Lời chào (VI)</Label>
+                <Textarea rows={2} value={appForm.chatbot_greeting_vi} onChange={e => setAppForm(p => ({ ...p, chatbot_greeting_vi: e.target.value }))} placeholder="👋 Xin chào! Tôi có thể giúp gì cho bạn?" />
+              </div>
+              <div className="md:col-span-2">
+                <Label>Lời chào (EN)</Label>
+                <Textarea rows={2} value={appForm.chatbot_greeting_en} onChange={e => setAppForm(p => ({ ...p, chatbot_greeting_en: e.target.value }))} placeholder="👋 Hi! How can I help you?" />
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <Button onClick={saveAppearance} disabled={savingApp}>
+              <Save className="w-4 h-4 mr-2" /> {savingApp ? 'Đang lưu...' : 'Lưu giao diện'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <MediaPicker
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        onSelect={(url) => { setAppForm(p => ({ ...p, chatbot_avatar_url: url })); setPickerOpen(false); }}
+        accept="image"
+      />
+
+      <div className="flex items-center justify-between pt-2">
+        <h2 className="text-lg font-semibold">Q&A đã huấn luyện</h2>
       </div>
 
       {isLoading ? (
