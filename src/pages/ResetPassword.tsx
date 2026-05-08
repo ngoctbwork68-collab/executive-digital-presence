@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Lock, KeyRound, CheckCircle2, Eye, EyeOff, ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
+import { Lock, KeyRound, CheckCircle2, Eye, EyeOff, ShieldCheck, Loader2, AlertTriangle, Home, ArrowLeft } from 'lucide-react';
+
+const HOME_URL = '/';
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -138,12 +140,17 @@ export default function ResetPassword() {
                 Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu link mới.
               </p>
             </div>
-            <Button
-              onClick={() => navigate('/admin')}
-              className="rounded-xl bg-gradient-to-r from-[hsl(var(--gold-dark))] to-[hsl(var(--gold-main))] text-[hsl(var(--navy-dark))] font-semibold"
-            >
-              Quay lại đăng nhập
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <Button
+                onClick={() => navigate('/admin')}
+                className="rounded-xl bg-gradient-to-r from-[hsl(var(--gold-dark))] to-[hsl(var(--gold-main))] text-[hsl(var(--navy-dark))] font-semibold"
+              >
+                <ArrowLeft className="w-4 h-4 mr-1" /> Quay lại đăng nhập
+              </Button>
+              <Button asChild variant="outline" className="rounded-xl">
+                <a href={HOME_URL}><Home className="w-4 h-4 mr-1" /> Về trang chủ</a>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -253,9 +260,13 @@ export default function ResetPassword() {
                 </Button>
               </form>
 
-              <div className="text-center">
-                <a href="/admin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Quay lại đăng nhập
+              <div className="flex items-center justify-center gap-4 text-sm">
+                <a href="/admin" className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                  <ArrowLeft className="w-3.5 h-3.5" /> Đăng nhập
+                </a>
+                <span className="text-border">•</span>
+                <a href={HOME_URL} className="text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+                  <Home className="w-3.5 h-3.5" /> Trang chủ
                 </a>
               </div>
             </>
