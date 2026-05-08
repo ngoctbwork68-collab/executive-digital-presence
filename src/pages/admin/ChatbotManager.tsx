@@ -123,7 +123,71 @@ export default function ChatbotManager() {
         <Button onClick={openCreate}><Plus className="w-4 h-4 mr-2" />Thêm Q&A</Button>
       </div>
 
-      {isLoading ? (
+      {/* Appearance */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg"><Bot className="w-5 h-5" /> Giao diện Chatbot</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-start gap-4">
+            <div className="shrink-0">
+              <Label className="mb-2 block">Ảnh đại diện</Label>
+              <div className="w-24 h-24 rounded-2xl border-2 border-dashed border-border bg-muted/30 flex items-center justify-center overflow-hidden relative group">
+                {appForm.chatbot_avatar_url ? (
+                  <img src={appForm.chatbot_avatar_url} alt="Chatbot avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <Bot className="w-10 h-10 text-muted-foreground/40" />
+                )}
+              </div>
+              <div className="flex gap-1 mt-2">
+                <Button type="button" variant="outline" size="sm" onClick={() => setPickerOpen(true)}>
+                  <ImageIcon className="w-3.5 h-3.5 mr-1" /> Chọn
+                </Button>
+                {appForm.chatbot_avatar_url && (
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setAppForm(p => ({ ...p, chatbot_avatar_url: '' }))}>
+                    <X className="w-3.5 h-3.5" />
+                  </Button>
+                )}
+              </div>
+            </div>
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <Label>Tên chatbot (VI)</Label>
+                <Input value={appForm.chatbot_name_vi} onChange={e => setAppForm(p => ({ ...p, chatbot_name_vi: e.target.value }))} placeholder="Trợ lý AI" />
+              </div>
+              <div>
+                <Label>Tên chatbot (EN)</Label>
+                <Input value={appForm.chatbot_name_en} onChange={e => setAppForm(p => ({ ...p, chatbot_name_en: e.target.value }))} placeholder="AI Assistant" />
+              </div>
+              <div className="md:col-span-2">
+                <Label>Lời chào (VI)</Label>
+                <Textarea rows={2} value={appForm.chatbot_greeting_vi} onChange={e => setAppForm(p => ({ ...p, chatbot_greeting_vi: e.target.value }))} placeholder="👋 Xin chào! Tôi có thể giúp gì cho bạn?" />
+              </div>
+              <div className="md:col-span-2">
+                <Label>Lời chào (EN)</Label>
+                <Textarea rows={2} value={appForm.chatbot_greeting_en} onChange={e => setAppForm(p => ({ ...p, chatbot_greeting_en: e.target.value }))} placeholder="👋 Hi! How can I help you?" />
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <Button onClick={saveAppearance} disabled={savingApp}>
+              <Save className="w-4 h-4 mr-2" /> {savingApp ? 'Đang lưu...' : 'Lưu giao diện'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <MediaPicker
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        onSelect={(url) => { setAppForm(p => ({ ...p, chatbot_avatar_url: url })); setPickerOpen(false); }}
+        accept="image"
+      />
+
+      <div className="flex items-center justify-between pt-2">
+        <h2 className="text-lg font-semibold">Q&A đã huấn luyện</h2>
+      </div>
+
         <div className="text-center py-12 text-muted-foreground">Đang tải...</div>
       ) : !data.length ? (
         <div className="text-center py-16 border border-dashed rounded-2xl">
