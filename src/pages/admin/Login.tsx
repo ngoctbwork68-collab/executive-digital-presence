@@ -184,11 +184,8 @@ export default function AdminLogin() {
             </Button>
           </form>
 
-          <div className="text-center">
-            <a
-              href="/"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
+          <div className="flex items-center justify-center gap-4 text-sm">
+            <a href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
               <ArrowLeft className="w-4 h-4" />
               Quay lại trang chủ
             </a>
