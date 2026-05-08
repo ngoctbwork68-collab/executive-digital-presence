@@ -184,9 +184,13 @@ const ChatbotWidget = () => {
     setMessages([{ role: 'assistant', content: getGreeting() }]);
   };
 
-  const getGreeting = () => language === 'en'
-    ? "👋 Hi! I'm the AI portfolio assistant. I know all about the portfolio owner's skills, experience, projects, and education. Ask me anything!"
-    : "👋 Xin chào! Tôi là trợ lý AI portfolio. Tôi biết rõ về kỹ năng, kinh nghiệm, dự án và học vấn của chủ portfolio. Hỏi tôi bất cứ điều gì!";
+  const getGreeting = () => {
+    const custom = language === 'en' ? appearance?.chatbot_greeting_en : appearance?.chatbot_greeting_vi;
+    if (custom?.trim()) return custom;
+    return language === 'en'
+      ? "👋 Hi! I'm the AI portfolio assistant. I know all about the portfolio owner's skills, experience, projects, and education. Ask me anything!"
+      : "👋 Xin chào! Tôi là trợ lý AI portfolio. Tôi biết rõ về kỹ năng, kinh nghiệm, dự án và học vấn của chủ portfolio. Hỏi tôi bất cứ điều gì!";
+  };
 
   const showSuggestions = messages.length <= 1;
 
