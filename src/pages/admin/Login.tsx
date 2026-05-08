@@ -164,11 +164,7 @@ export default function AdminLogin() {
             <div className="flex justify-end">
               <button
                 type="button"
-                onClick={() => {
-                  setForgotOpen(true);
-                  setForgotSent(false);
-                  setForgotEmail(email);
-                }}
+                onClick={() => navigate('/forgot-password')}
                 className="text-sm text-[hsl(var(--gold-dark))] hover:text-[hsl(var(--gold-main))] transition-colors font-medium"
               >
                 Quên mật khẩu?
