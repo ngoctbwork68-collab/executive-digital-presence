@@ -256,8 +256,8 @@ const ChatbotWidget = () => {
                 style={{ animationDelay: `${Math.min(i * 0.05, 0.3)}s`, animationFillMode: 'both' }}
               >
                 {msg.role === 'assistant' && (
-                  <div className="w-7 h-7 rounded-full bg-secondary/20 flex items-center justify-center shrink-0 mt-0.5">
-                    <Bot size={14} className="text-secondary" />
+                  <div className="w-7 h-7 rounded-full bg-secondary/20 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
+                    {botAvatar ? <img src={botAvatar} alt="" className="w-full h-full object-cover" /> : <Bot size={14} className="text-secondary" />}
                   </div>
                 )}
                 <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
