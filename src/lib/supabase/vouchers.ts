@@ -61,14 +61,11 @@ export const vouchersAPI = {
   },
 
   async getByCode(code: string) {
-    const { data, error } = await supabase
-      .from('vouchers')
-      .select('*')
-      .eq('code', code.toUpperCase())
-      .eq('active', true)
-      .single();
+    const { data, error } = await supabase.rpc('validate_voucher_by_code', { _code: code });
     if (error) throw error;
-    return data as Voucher;
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row) throw new Error('Voucher not found');
+    return row as Voucher;
   },
 
   async create(v: Partial<Voucher>) {
