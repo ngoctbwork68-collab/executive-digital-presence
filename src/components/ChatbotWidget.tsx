@@ -3,6 +3,8 @@ import { MessageCircle, X, Send, Bot, User, Sparkles, RotateCcw, ChevronDown } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/lib/i18n';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
@@ -11,6 +13,8 @@ interface Message {
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+
+const APPEARANCE_KEYS = ['chatbot_avatar_url', 'chatbot_name_vi', 'chatbot_name_en', 'chatbot_greeting_vi', 'chatbot_greeting_en'];
 
 async function streamChat({
   messages,
