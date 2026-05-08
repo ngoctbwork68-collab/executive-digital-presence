@@ -15,6 +15,9 @@ import { Plus, Pencil, Trash2, Bot, MessageCircleQuestion, Image as ImageIcon, S
 
 const empty = { question: '', answer: '', keywords: '', language: 'vi', priority: 0, active: true };
 
+const APPEARANCE_KEYS = ['chatbot_avatar_url', 'chatbot_name_vi', 'chatbot_name_en', 'chatbot_greeting_vi', 'chatbot_greeting_en'] as const;
+type AppearanceKey = typeof APPEARANCE_KEYS[number];
+
 export default function ChatbotManager() {
   const qc = useQueryClient();
   const { data = [], isLoading } = useQuery({
@@ -24,9 +27,50 @@ export default function ChatbotManager() {
       return data || [];
     },
   });
-  const [open, setOpen] = useState(false);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [form, setForm] = useState(empty);
+
+  const { data: appearance } = useQuery({
+    queryKey: ['chatbot_appearance'],
+    queryFn: async () => {
+      const { data } = await supabase.from('settings').select('key, value').in('key', APPEARANCE_KEYS as any);
+      const map: Record<string, string> = {};
+      (data || []).forEach((r: any) => { map[r.key] = r.value; });
+      return map;
+    },
+  });
+
+  const [appForm, setAppForm] = useState<Record<AppearanceKey, string>>({
+    chatbot_avatar_url: '', chatbot_name_vi: '', chatbot_name_en: '',
+    chatbot_greeting_vi: '', chatbot_greeting_en: '',
+  });
+  const [appLoaded, setAppLoaded] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [savingApp, setSavingApp] = useState(false);
+
+  if (appearance && !appLoaded) {
+    setAppForm({
+      chatbot_avatar_url: appearance.chatbot_avatar_url || '',
+      chatbot_name_vi: appearance.chatbot_name_vi || 'Trợ lý AI',
+      chatbot_name_en: appearance.chatbot_name_en || 'AI Assistant',
+      chatbot_greeting_vi: appearance.chatbot_greeting_vi || '',
+      chatbot_greeting_en: appearance.chatbot_greeting_en || '',
+    });
+    setAppLoaded(true);
+  }
+
+  const saveAppearance = async () => {
+    setSavingApp(true);
+    try {
+      const rows = APPEARANCE_KEYS.map(k => ({ key: k, value: appForm[k] || '' }));
+      const { error } = await supabase.from('settings').upsert(rows, { onConflict: 'key' });
+      if (error) throw error;
+      toast.success('Đã lưu giao diện chatbot');
+      qc.invalidateQueries({ queryKey: ['chatbot_appearance'] });
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setSavingApp(false);
+    }
+  };
 
   const openCreate = () => { setEditId(null); setForm(empty); setOpen(true); };
   const openEdit = (q: any) => {
