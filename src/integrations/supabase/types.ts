@@ -992,6 +992,26 @@ export type Database = {
         }
         Returns: boolean
       }
+      validate_voucher_by_code: {
+        Args: { _code: string }
+        Returns: {
+          active: boolean
+          code: string
+          created_at: string
+          description: string
+          discount_type: string
+          discount_value: number
+          id: string
+          max_discount: number
+          min_order_amount: number
+          product_types: string[]
+          updated_at: string
+          usage_limit: number
+          used_count: number
+          valid_from: string
+          valid_until: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "user"
