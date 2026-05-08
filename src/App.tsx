@@ -14,6 +14,7 @@ import Store from "./pages/Store";
 import StoreDetail from "./pages/StoreDetail";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import ProfileManager from "./pages/admin/ProfileManager";
@@ -62,6 +63,7 @@ const App = () => (
           <Route path="/store" element={<Store />} />
           <Route path="/store/:slug" element={<StoreDetail />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
             <Route path="dashboard" element={<AdminDashboard />} />

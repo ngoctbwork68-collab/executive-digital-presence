@@ -175,12 +175,17 @@ export default function ResetPassword() {
                 <h1 className="font-display text-2xl font-bold text-foreground">Đổi mật khẩu thành công!</h1>
                 <p className="text-muted-foreground text-sm">Bạn sẽ được chuyển hướng đến trang đăng nhập...</p>
               </div>
-              <Button
-                onClick={() => navigate('/admin')}
-                className="rounded-xl bg-gradient-to-r from-[hsl(var(--gold-dark))] to-[hsl(var(--gold-main))] text-[hsl(var(--navy-dark))] font-semibold"
-              >
-                Đăng nhập ngay
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <Button
+                  onClick={() => navigate('/admin')}
+                  className="rounded-xl bg-gradient-to-r from-[hsl(var(--gold-dark))] to-[hsl(var(--gold-main))] text-[hsl(var(--navy-dark))] font-semibold"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-1" /> Đăng nhập ngay
+                </Button>
+                <Button asChild variant="outline" className="rounded-xl">
+                  <a href={HOME_URL}><Home className="w-4 h-4 mr-1" /> Về trang chủ</a>
+                </Button>
+              </div>
             </div>
           ) : (
             <>
