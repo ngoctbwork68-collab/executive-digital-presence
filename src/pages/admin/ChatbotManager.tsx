@@ -188,6 +188,7 @@ export default function ChatbotManager() {
         <h2 className="text-lg font-semibold">Q&A đã huấn luyện</h2>
       </div>
 
+      {isLoading ? (
         <div className="text-center py-12 text-muted-foreground">Đang tải...</div>
       ) : !data.length ? (
         <div className="text-center py-16 border border-dashed rounded-2xl">
