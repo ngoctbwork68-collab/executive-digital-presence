@@ -218,14 +218,16 @@ const ChatbotWidget = () => {
           {/* Header */}
           <div className="bg-primary text-primary-foreground px-4 py-3 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-full bg-secondary/20 flex items-center justify-center relative">
-                <Sparkles size={16} className="text-secondary" />
+              <div className="w-9 h-9 rounded-full bg-secondary/20 flex items-center justify-center relative overflow-hidden">
+                {botAvatar ? (
+                  <img src={botAvatar} alt={botName} className="w-full h-full object-cover" />
+                ) : (
+                  <Sparkles size={16} className="text-secondary" />
+                )}
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-primary" />
               </div>
               <div>
-                <span className="font-semibold text-sm block leading-tight">
-                  {language === 'en' ? 'AI Assistant' : 'Trợ lý AI'}
-                </span>
+                <span className="font-semibold text-sm block leading-tight">{botName}</span>
                 <span className="text-[10px] opacity-60">
                   {loading ? (language === 'en' ? 'Typing...' : 'Đang trả lời...') : 'Online'}
                 </span>
