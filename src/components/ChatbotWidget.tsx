@@ -105,6 +105,22 @@ const ChatbotWidget = () => {
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const { data: appearance } = useQuery({
+    queryKey: ['chatbot_appearance_public'],
+    queryFn: async () => {
+      const { data } = await supabase.from('settings').select('key, value').in('key', APPEARANCE_KEYS);
+      const map: Record<string, string> = {};
+      (data || []).forEach((r: any) => { map[r.key] = r.value; });
+      return map;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const botAvatar = appearance?.chatbot_avatar_url || '';
+  const botName = language === 'en'
+    ? (appearance?.chatbot_name_en || 'AI Assistant')
+    : (appearance?.chatbot_name_vi || 'Trợ lý AI');
+
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
