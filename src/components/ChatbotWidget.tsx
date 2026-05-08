@@ -282,8 +282,8 @@ const ChatbotWidget = () => {
             {/* Typing indicator */}
             {loading && messages[messages.length - 1]?.role !== 'assistant' && (
               <div className="flex gap-2 items-start animate-fade-in">
-                <div className="w-7 h-7 rounded-full bg-secondary/20 flex items-center justify-center">
-                  <Bot size={14} className="text-secondary" />
+                <div className="w-7 h-7 rounded-full bg-secondary/20 flex items-center justify-center overflow-hidden">
+                  {botAvatar ? <img src={botAvatar} alt="" className="w-full h-full object-cover" /> : <Bot size={14} className="text-secondary" />}
                 </div>
                 <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3">
                   <div className="flex gap-1.5">
