@@ -72,6 +72,10 @@ export default function ChatbotManager() {
     }
   };
 
+  const [open, setOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [form, setForm] = useState(empty);
+
   const openCreate = () => { setEditId(null); setForm(empty); setOpen(true); };
   const openEdit = (q: any) => {
     setEditId(q.id);
