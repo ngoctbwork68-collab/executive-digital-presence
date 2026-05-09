@@ -87,76 +87,75 @@ const Contact = () => {
       {/* Contact Content */}
       <section className="container mx-auto px-4 py-16 md:py-20">
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-12">
-          {/* Contact Form */}
+          {/* Form / Booking tabs */}
           <div className="lg:col-span-3">
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-8">
-                <h2 className="font-serif text-2xl font-bold mb-6">
-                  {language === 'en' ? 'Send a Message' : 'Gửi tin nhắn'}
-                </h2>
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium mb-1.5 block">
-                        {language === 'en' ? 'Full Name' : 'Họ và tên'} *
-                      </label>
-                      <Input
-                        required
-                        value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        placeholder={language === 'en' ? 'Your name' : 'Tên của bạn'}
-                        className="rounded-lg"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-1.5 block">Email *</label>
-                      <Input
-                        required
-                        type="email"
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        placeholder="email@example.com"
-                        className="rounded-lg"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1.5 block">
-                      {language === 'en' ? 'Phone (optional)' : 'Số điện thoại (tùy chọn)'}
-                    </label>
-                    <Input
-                      value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      placeholder="+84..."
-                      className="rounded-lg"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1.5 block">
-                      {language === 'en' ? 'Message' : 'Tin nhắn'} *
-                    </label>
-                    <Textarea
-                      required
-                      value={form.message}
-                      onChange={(e) => setForm({ ...form, message: e.target.value })}
-                      placeholder={language === 'en' ? 'How can I help you?' : 'Tôi có thể giúp gì cho bạn?'}
-                      rows={5}
-                      className="rounded-lg resize-none"
-                    />
-                  </div>
-                  <Button type="submit" size="lg" disabled={sending} className="w-full rounded-lg gold-shine">
-                    {sending ? (
-                      <span className="animate-pulse">{language === 'en' ? 'Sending...' : 'Đang gửi...'}</span>
-                    ) : (
-                      <>
-                        <Send size={18} className="mr-2" />
-                        {language === 'en' ? 'Send Message' : 'Gửi tin nhắn'}
-                      </>
-                    )}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+            <Tabs defaultValue="message" className="w-full">
+              <TabsList className="grid grid-cols-2 mb-4 rounded-lg">
+                <TabsTrigger value="message" className="rounded-md gap-2">
+                  <MessageSquare className="w-4 h-4" />
+                  {language === 'en' ? 'Message' : 'Tin nhắn'}
+                </TabsTrigger>
+                <TabsTrigger value="booking" className="rounded-md gap-2">
+                  <CalendarDays className="w-4 h-4" />
+                  {language === 'en' ? 'Book a meeting' : 'Đặt lịch'}
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="message">
+                <Card className="border-0 shadow-lg">
+                  <CardContent className="p-8">
+                    <h2 className="font-serif text-2xl font-bold mb-6">
+                      {language === 'en' ? 'Send a Message' : 'Gửi tin nhắn'}
+                    </h2>
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium mb-1.5 block">
+                            {language === 'en' ? 'Full Name' : 'Họ và tên'} *
+                          </label>
+                          <Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+                            placeholder={language === 'en' ? 'Your name' : 'Tên của bạn'} className="rounded-lg" />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium mb-1.5 block">Email *</label>
+                          <Input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
+                            placeholder="email@example.com" className="rounded-lg" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-1.5 block">
+                          {language === 'en' ? 'Phone (optional)' : 'Số điện thoại (tùy chọn)'}
+                        </label>
+                        <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                          placeholder="+84..." className="rounded-lg" />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium mb-1.5 block">
+                          {language === 'en' ? 'Message' : 'Tin nhắn'} *
+                        </label>
+                        <Textarea required value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })}
+                          placeholder={language === 'en' ? 'How can I help you?' : 'Tôi có thể giúp gì cho bạn?'}
+                          rows={5} className="rounded-lg resize-none" />
+                      </div>
+                      <Button type="submit" size="lg" disabled={sending} className="w-full rounded-lg gold-shine">
+                        {sending ? (
+                          <span className="animate-pulse">{language === 'en' ? 'Sending...' : 'Đang gửi...'}</span>
+                        ) : (
+                          <>
+                            <Send size={18} className="mr-2" />
+                            {language === 'en' ? 'Send Message' : 'Gửi tin nhắn'}
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="booking">
+                <BookingForm />
+              </TabsContent>
+            </Tabs>
           </div>
 
           {/* Contact Info */}
