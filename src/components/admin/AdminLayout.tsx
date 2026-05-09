@@ -47,6 +47,7 @@ const menuGroups = [
     label: 'Hệ thống',
     items: [
       { path: '/admin/contacts', icon: MessageCircle, label: 'Liên hệ' },
+      { path: '/admin/bookings', icon: CalendarDays, label: 'Đặt lịch' },
       { path: '/admin/chatbot', icon: Bot, label: 'Chatbot' },
       { path: '/admin/custom-sections', icon: Blocks, label: 'Custom Sections' },
       { path: '/admin/media', icon: Image, label: 'Thư viện' },
