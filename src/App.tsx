@@ -87,6 +87,7 @@ const App = () => (
             <Route path="categories" element={<CategoriesManager />} />
             <Route path="chatbot" element={<ChatbotManager />} />
             <Route path="sections-order" element={<SectionsOrderManager />} />
+            <Route path="bookings" element={<BookingsManager />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
