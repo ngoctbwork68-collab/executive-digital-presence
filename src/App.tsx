@@ -36,6 +36,7 @@ import OrdersManager from "./pages/admin/OrdersManager";
 import CategoriesManager from "./pages/admin/CategoriesManager";
 import ChatbotManager from "./pages/admin/ChatbotManager";
 import SectionsOrderManager from "./pages/admin/SectionsOrderManager";
+import BookingsManager from "./pages/admin/BookingsManager";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./components/admin/AdminLayout";
 import BackToTop from "./components/BackToTop";
@@ -86,6 +87,7 @@ const App = () => (
             <Route path="categories" element={<CategoriesManager />} />
             <Route path="chatbot" element={<ChatbotManager />} />
             <Route path="sections-order" element={<SectionsOrderManager />} />
+            <Route path="bookings" element={<BookingsManager />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
