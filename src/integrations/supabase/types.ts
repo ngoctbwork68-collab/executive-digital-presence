@@ -178,6 +178,63 @@ export type Database = {
           },
         ]
       }
+      bookings: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string | null
+          duration_minutes: number
+          end_time: string
+          google_event_id: string | null
+          google_event_link: string | null
+          google_sync_error: string | null
+          id: string
+          message: string | null
+          start_time: string
+          status: string
+          topic: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone?: string | null
+          duration_minutes?: number
+          end_time: string
+          google_event_id?: string | null
+          google_event_link?: string | null
+          google_sync_error?: string | null
+          id?: string
+          message?: string | null
+          start_time: string
+          status?: string
+          topic?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string | null
+          duration_minutes?: number
+          end_time?: string
+          google_event_id?: string | null
+          google_event_link?: string | null
+          google_sync_error?: string | null
+          id?: string
+          message?: string | null
+          start_time?: string
+          status?: string
+          topic?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string | null
