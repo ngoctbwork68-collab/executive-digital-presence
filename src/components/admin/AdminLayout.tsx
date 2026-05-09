@@ -8,7 +8,7 @@ import {
   User, Briefcase, FolderOpen, Activity, FileText,
   Image, Settings, LogOut, LayoutDashboard, GraduationCap,
   Sun, Moon, Menu, X, ChevronRight, Blocks, ShoppingBag, Ticket, Quote, MessageCircle, BookOpen,
-  Sparkles, Package, Tags, Bot, LayoutGrid
+  Sparkles, Package, Tags, Bot, LayoutGrid, CalendarDays
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
