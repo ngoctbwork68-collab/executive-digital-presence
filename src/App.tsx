@@ -36,6 +36,7 @@ import OrdersManager from "./pages/admin/OrdersManager";
 import CategoriesManager from "./pages/admin/CategoriesManager";
 import ChatbotManager from "./pages/admin/ChatbotManager";
 import SectionsOrderManager from "./pages/admin/SectionsOrderManager";
+import BookingsManager from "./pages/admin/BookingsManager";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./components/admin/AdminLayout";
 import BackToTop from "./components/BackToTop";
