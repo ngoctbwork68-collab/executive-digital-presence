@@ -11,8 +11,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Mail, MapPin, Linkedin, Github, Twitter, Phone, Send, ArrowRight } from 'lucide-react';
+import { Mail, MapPin, Linkedin, Github, Twitter, Phone, Send, MessageSquare, CalendarDays } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import BookingForm from '@/components/BookingForm';
 
 const Contact = () => {
   const { language } = useLanguage();
