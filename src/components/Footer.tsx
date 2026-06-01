@@ -111,7 +111,7 @@ const Footer = () => {
             )}
           </Link>
           <p className="text-sm opacity-70 max-w-md mx-auto mb-6">
-            {footerTagline?.value || profile?.quote || ''}
+            {stripHtml(footerTagline?.value || profile?.quote || '')}
           </p>
           <div className="flex flex-wrap justify-center gap-6 mb-6">
             {quickLinks.map((item) => (
