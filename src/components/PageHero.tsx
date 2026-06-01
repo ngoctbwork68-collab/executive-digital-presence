@@ -18,9 +18,9 @@ const PageHero = ({ pageKey, defaultTitle, defaultSubtitle, defaultLabel, childr
   // If hero is explicitly hidden
   if (hero?.visible === false) return null;
 
-  const title = (language === 'en' ? hero?.title_en : hero?.title_vi) || (language === 'en' ? defaultTitle.en : defaultTitle.vi);
-  const subtitle = (language === 'en' ? hero?.subtitle_en : hero?.subtitle_vi) || (language === 'en' ? defaultSubtitle.en : defaultSubtitle.vi);
-  const label = (language === 'en' ? hero?.label_en : hero?.label_vi) || (defaultLabel ? (language === 'en' ? defaultLabel.en : defaultLabel.vi) : '');
+  const title = stripHtml((language === 'en' ? hero?.title_en : hero?.title_vi) || (language === 'en' ? defaultTitle.en : defaultTitle.vi));
+  const subtitle = stripHtml((language === 'en' ? hero?.subtitle_en : hero?.subtitle_vi) || (language === 'en' ? defaultSubtitle.en : defaultSubtitle.vi));
+  const label = stripHtml((language === 'en' ? hero?.label_en : hero?.label_vi) || (defaultLabel ? (language === 'en' ? defaultLabel.en : defaultLabel.vi) : ''));
   const bgImage = hero?.background_image_url;
 
   return (
