@@ -239,8 +239,6 @@ const Contact = () => {
       </section>
 
       {/* Map */}
-      <section className="container mx-auto px-4 pb-16">
-        <div className="max-w-5xl mx-auto rounded-2xl overflow-hidden shadow-lg">
       {(() => {
         const raw = contact?.map_embed_url || '';
         const match = raw.match(/<iframe[^>]*\ssrc=["']([^"']+)["']/i);
