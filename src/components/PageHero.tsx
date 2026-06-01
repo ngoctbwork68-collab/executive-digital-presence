@@ -1,5 +1,6 @@
 import { useLanguage } from '@/lib/i18n';
 import { usePageHeroes } from '@/hooks/usePageHeroes';
+import { stripHtml } from '@/lib/stripHtml';
 
 interface PageHeroProps {
   pageKey: string;
