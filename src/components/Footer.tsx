@@ -8,6 +8,7 @@ import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { useLayoutSettings, type FooterStyle } from '@/hooks/useLayoutSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { stripHtml } from '@/lib/stripHtml';
 
 const allQuickLinks = [
   { path: '/about', label: { en: 'About', vi: 'Giới thiệu' } },
