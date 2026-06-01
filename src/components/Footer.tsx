@@ -8,6 +8,7 @@ import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { useLayoutSettings, type FooterStyle } from '@/hooks/useLayoutSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { stripHtml } from '@/lib/stripHtml';
 
 const allQuickLinks = [
   { path: '/about', label: { en: 'About', vi: 'Giới thiệu' } },
@@ -110,7 +111,7 @@ const Footer = () => {
             )}
           </Link>
           <p className="text-sm opacity-70 max-w-md mx-auto mb-6">
-            {footerTagline?.value || profile?.quote || ''}
+            {stripHtml(footerTagline?.value || profile?.quote || '')}
           </p>
           <div className="flex flex-wrap justify-center gap-6 mb-6">
             {quickLinks.map((item) => (
@@ -144,7 +145,7 @@ const Footer = () => {
               )}
             </Link>
             <p className="text-sm opacity-70 max-w-sm leading-relaxed">
-              {footerTagline?.value || profile?.quote || ''}
+              {stripHtml(footerTagline?.value || profile?.quote || '')}
             </p>
             {socialLinks && socialLinks.length > 0 && (
               <div className="flex flex-wrap gap-3 mt-6"><SocialIcons /></div>

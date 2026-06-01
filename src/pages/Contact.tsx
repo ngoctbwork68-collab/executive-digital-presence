@@ -239,20 +239,27 @@ const Contact = () => {
       </section>
 
       {/* Map */}
-      <section className="container mx-auto px-4 pb-16">
-        <div className="max-w-5xl mx-auto rounded-2xl overflow-hidden shadow-lg">
-          <iframe
-            src={contact?.map_embed_url || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d476855.7336670022!2d105.3230731579968!3d20.975176246258698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab9bd9861ca1%3A0xe7887f7b72ca17a9!2zSMOgIE7hu5lpLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1777937845356!5m2!1svi!2s"}
-            width="100%"
-            height="450"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Location Map"
-          />
-        </div>
-      </section>
+      {(() => {
+        const raw = contact?.map_embed_url || '';
+        const match = raw.match(/<iframe[^>]*\ssrc=["']([^"']+)["']/i);
+        const mapSrc = match ? match[1] : (raw && /^https?:\/\//.test(raw) ? raw : "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d476855.7336670022!2d105.3230731579968!3d20.975176246258698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab9bd9861ca1%3A0xe7887f7b72ca17a9!2zSMOgIE7hu5lpLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1777937845356!5m2!1svi!2s");
+        return (
+          <section className="container mx-auto px-4 pb-16">
+            <div className="max-w-5xl mx-auto rounded-2xl overflow-hidden shadow-lg">
+              <iframe
+                src={mapSrc}
+                width="100%"
+                height="450"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Location Map"
+              />
+            </div>
+          </section>
+        );
+      })()}
 
       <CustomSections page="contact" />
       <Footer />
