@@ -145,7 +145,7 @@ const Footer = () => {
               )}
             </Link>
             <p className="text-sm opacity-70 max-w-sm leading-relaxed">
-              {footerTagline?.value || profile?.quote || ''}
+              {stripHtml(footerTagline?.value || profile?.quote || '')}
             </p>
             {socialLinks && socialLinks.length > 0 && (
               <div className="flex flex-wrap gap-3 mt-6"><SocialIcons /></div>
