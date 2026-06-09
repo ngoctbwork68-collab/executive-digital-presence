@@ -1,0 +1,1 @@
+CREATE POLICY "Admins can update portfolio-media" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'portfolio-media' AND public.has_role(auth.uid(), 'admin'::public.app_role)) WITH CHECK (bucket_id = 'portfolio-media' AND public.has_role(auth.uid(), 'admin'::public.app_role));
