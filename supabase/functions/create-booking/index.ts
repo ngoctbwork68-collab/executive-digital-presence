@@ -18,6 +18,8 @@ const BookingSchema = z.object({
   start_time: z.string().datetime(),
   duration_minutes: z.number().int().min(15).max(240).default(30),
   timezone: z.string().max(80).optional().default("Asia/Ho_Chi_Minh"),
+  // Honeypot: must be empty. Bots fill hidden fields.
+  website: z.string().max(0).optional().nullable(),
 });
 
 Deno.serve(async (req) => {
@@ -52,6 +54,35 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
+
+    // Rate limit: reject if same email or phone created a booking in last 60s,
+    // or more than 5 bookings in the last hour.
+    const oneMinAgo = new Date(Date.now() - 60_000).toISOString();
+    const oneHourAgo = new Date(Date.now() - 3_600_000).toISOString();
+
+    const { count: recentBurst } = await supabase
+      .from("bookings")
+      .select("id", { count: "exact", head: true })
+      .eq("customer_email", customer_email)
+      .gte("created_at", oneMinAgo);
+    if ((recentBurst ?? 0) > 0) {
+      return new Response(
+        JSON.stringify({ error: "Bạn vừa gửi yêu cầu, vui lòng đợi một chút trước khi thử lại." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    const { count: hourly } = await supabase
+      .from("bookings")
+      .select("id", { count: "exact", head: true })
+      .eq("customer_email", customer_email)
+      .gte("created_at", oneHourAgo);
+    if ((hourly ?? 0) >= 5) {
+      return new Response(
+        JSON.stringify({ error: "Quá nhiều yêu cầu đặt lịch. Vui lòng thử lại sau." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     // 1) Insert booking
     const { data: booking, error: insertErr } = await supabase
