@@ -18,6 +18,8 @@ const BookingSchema = z.object({
   start_time: z.string().datetime(),
   duration_minutes: z.number().int().min(15).max(240).default(30),
   timezone: z.string().max(80).optional().default("Asia/Ho_Chi_Minh"),
+  // Honeypot: must be empty. Bots fill hidden fields.
+  website: z.string().max(0).optional().nullable(),
 });
 
 Deno.serve(async (req) => {
