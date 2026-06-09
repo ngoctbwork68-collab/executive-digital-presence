@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SmartImage from '@/components/SmartImage';
 import { useParams, Link } from 'react-router-dom';
 import { useProductBySlug } from '@/hooks/useStore';
 import { useLanguage } from '@/lib/i18n';
@@ -129,7 +130,7 @@ export default function StoreDetail() {
           <div>
             <div className="aspect-square rounded-2xl overflow-hidden bg-muted mb-4">
               {allImages.length > 0 ? (
-                <img src={allImages[selectedImage]} alt={product.name} className="w-full h-full object-cover" />
+                <SmartImage src={allImages[selectedImage]} alt={product.name} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <ShoppingBag size={64} className="text-muted-foreground/30" />
@@ -146,7 +147,7 @@ export default function StoreDetail() {
                       selectedImage === i ? 'border-primary' : 'border-transparent'
                     }`}
                   >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <SmartImage src={img} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -328,7 +329,7 @@ export default function StoreDetail() {
               <div className="flex-1 text-center md:text-left">
                 {bank && (
                   <div className="flex items-center gap-2 justify-center md:justify-start mb-3">
-                    <img src={bank.logo} alt={bank.shortName} className="w-10 h-10 object-contain" />
+                    <SmartImage src={bank.logo} alt={bank.shortName} className="w-10 h-10 object-contain" />
                     <div>
                       <p className="font-bold text-sm">{bank.name}</p>
                       <p className="text-xs text-muted-foreground">{bank.shortName}</p>
@@ -441,7 +442,7 @@ export default function StoreDetail() {
             {/* Order Summary */}
             <div className="bg-primary/5 rounded-xl p-4 border border-primary/10">
               <div className="flex items-center gap-3">
-                {product.image_url && <img src={product.image_url} alt="" className="w-14 h-14 rounded-lg object-cover" />}
+                {product.image_url && <SmartImage src={product.image_url} alt="" className="w-14 h-14 rounded-lg object-cover" />}
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm truncate">{product.name}</p>
                   <p className="text-xs text-muted-foreground">Số lượng: {quantity}</p>

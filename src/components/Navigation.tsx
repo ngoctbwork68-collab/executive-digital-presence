@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SmartImage from '@/components/SmartImage';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -114,7 +115,7 @@ const Navigation = () => {
           <div className="flex h-14 items-center justify-between">
             <Link to="/" className="flex items-center gap-2 shrink-0">
               {logoUrl ? (
-                <img src={logoUrl} alt={siteName} className="h-8 w-auto object-contain" />
+                <SmartImage src={logoUrl} alt={siteName} className="h-8 w-auto object-contain" />
               ) : (
                 <span className="text-lg font-serif font-bold text-primary">{siteName}</span>
               )}
@@ -163,7 +164,7 @@ const Navigation = () => {
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
             {logoUrl ? (
-              <img src={logoUrl} alt={siteName} className="h-9 w-auto object-contain" />
+              <SmartImage src={logoUrl} alt={siteName} className="h-9 w-auto object-contain" />
             ) : (
               <span className="text-xl font-serif font-bold text-primary">{siteName}</span>
             )}

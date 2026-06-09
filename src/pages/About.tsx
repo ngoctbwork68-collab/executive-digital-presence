@@ -1,4 +1,5 @@
 import { useLanguage } from '@/lib/i18n';
+import SmartImage from '@/components/SmartImage';
 import { useProfile } from '@/hooks/useProfile';
 import { usePublishedExperiences } from '@/hooks/useExperiences';
 import { usePublishedActivities } from '@/hooks/useActivities';
@@ -104,7 +105,7 @@ const About = () => {
               <div className="md:col-span-1 flex justify-center">
                 {profile.profile_image_url ? (
                   <div className="relative">
-                    <img src={profile.profile_image_url} alt={profile.name}
+                    <SmartImage src={profile.profile_image_url} alt={profile.name}
                       className="w-56 h-56 md:w-full md:h-auto md:aspect-square object-cover rounded-2xl shadow-navy" />
                     <div className="absolute -bottom-3 -right-3 w-24 h-24 bg-secondary/20 rounded-2xl -z-10" />
                   </div>
@@ -309,7 +310,7 @@ const About = () => {
                   <Card key={activity.id} className="card-premium overflow-hidden group border-0 shadow-md animate-fade-in" style={{ animationDelay: `${index * 80}ms` }}>
                     {activity.image_url ? (
                       <div className="aspect-video overflow-hidden">
-                        <img src={activity.image_url} alt={activity.title}
+                        <SmartImage src={activity.image_url} alt={activity.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       </div>
                     ) : (

@@ -62,6 +62,7 @@ const RichContent = ({ html, className, id }: RichContentProps) => {
     const imgs = container.querySelectorAll('img');
     imgs.forEach((img) => {
       img.loading = 'lazy';
+      img.decoding = 'async';
       img.referrerPolicy = 'no-referrer';
       const handleError = () => {
         const placeholder = document.createElement('div');

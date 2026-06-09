@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SmartImage from '@/components/SmartImage';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { usePublishedPosts, useFeaturedPosts, useAllCategories } from '@/hooks/useBlog';
@@ -63,7 +64,7 @@ const Blog = () => {
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <div className="aspect-[21/9] md:aspect-[21/8]">
                   {featuredPosts[0].image_url ? (
-                    <img src={featuredPosts[0].image_url} alt={featuredPosts[0].title}
+                    <SmartImage src={featuredPosts[0].image_url} alt={featuredPosts[0].title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-primary/20 via-secondary/10 to-primary/5 flex items-center justify-center">
@@ -106,7 +107,7 @@ const Blog = () => {
                       <div className="flex h-full">
                         {post.image_url && (
                           <div className="w-40 md:w-48 shrink-0 overflow-hidden">
-                            <img src={post.image_url} alt={post.title}
+                            <SmartImage src={post.image_url} alt={post.title}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                           </div>
                         )}
@@ -199,7 +200,7 @@ const Blog = () => {
                       {/* Image */}
                       <div className="relative aspect-[16/10] rounded-xl overflow-hidden mb-4 bg-muted">
                         {post.image_url ? (
-                          <img src={post.image_url} alt={post.title}
+                          <SmartImage src={post.image_url} alt={post.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
