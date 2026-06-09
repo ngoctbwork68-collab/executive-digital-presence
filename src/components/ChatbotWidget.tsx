@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import SmartImage from '@/components/SmartImage';
 import { MessageCircle, X, Send, Bot, User, Sparkles, RotateCcw, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -220,7 +221,7 @@ const ChatbotWidget = () => {
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-full bg-secondary/20 flex items-center justify-center relative overflow-hidden">
                 {botAvatar ? (
-                  <img src={botAvatar} alt={botName} className="w-full h-full object-cover" />
+                  <SmartImage src={botAvatar} alt={botName} className="w-full h-full object-cover" />
                 ) : (
                   <Sparkles size={16} className="text-secondary" />
                 )}
@@ -257,7 +258,7 @@ const ChatbotWidget = () => {
               >
                 {msg.role === 'assistant' && (
                   <div className="w-7 h-7 rounded-full bg-secondary/20 flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
-                    {botAvatar ? <img src={botAvatar} alt="" className="w-full h-full object-cover" /> : <Bot size={14} className="text-secondary" />}
+                    {botAvatar ? <SmartImage src={botAvatar} alt="" className="w-full h-full object-cover" /> : <Bot size={14} className="text-secondary" />}
                   </div>
                 )}
                 <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
@@ -283,7 +284,7 @@ const ChatbotWidget = () => {
             {loading && messages[messages.length - 1]?.role !== 'assistant' && (
               <div className="flex gap-2 items-start animate-fade-in">
                 <div className="w-7 h-7 rounded-full bg-secondary/20 flex items-center justify-center overflow-hidden">
-                  {botAvatar ? <img src={botAvatar} alt="" className="w-full h-full object-cover" /> : <Bot size={14} className="text-secondary" />}
+                  {botAvatar ? <SmartImage src={botAvatar} alt="" className="w-full h-full object-cover" /> : <Bot size={14} className="text-secondary" />}
                 </div>
                 <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3">
                   <div className="flex gap-1.5">

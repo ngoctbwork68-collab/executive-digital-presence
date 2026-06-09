@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import SmartImage from '@/components/SmartImage';
 import { Linkedin, Github, Twitter, Mail, ArrowUpRight, Facebook, Instagram, Youtube, Globe } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { useProfile } from '@/hooks/useProfile';
@@ -105,7 +106,7 @@ const Footer = () => {
         <div className="container mx-auto px-4 py-12 text-center">
           <Link to="/" className="inline-block mb-4">
             {logoUrl ? (
-              <img src={logoUrl} alt={siteName} className="h-10 w-auto object-contain brightness-0 invert mx-auto" />
+              <SmartImage src={logoUrl} alt={siteName} className="h-10 w-auto object-contain brightness-0 invert mx-auto" />
             ) : (
               <span className="font-serif text-2xl font-bold text-secondary">{siteName}</span>
             )}
@@ -139,7 +140,7 @@ const Footer = () => {
           <div className="md:col-span-2">
             <Link to="/" className="inline-block mb-4">
               {logoUrl ? (
-                <img src={logoUrl} alt={siteName} className="h-10 w-auto object-contain brightness-0 invert" />
+                <SmartImage src={logoUrl} alt={siteName} className="h-10 w-auto object-contain brightness-0 invert" />
               ) : (
                 <span className="font-serif text-2xl font-bold text-secondary">{siteName}</span>
               )}

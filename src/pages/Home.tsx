@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import SmartImage from '@/components/SmartImage';
 import { useEffect, useState, useRef } from 'react';
 import { ArrowRight, Briefcase, TrendingUp, Users, Sparkles, Quote } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -216,7 +217,7 @@ const Home = () => {
                       <Card className="card-premium overflow-hidden group border-0 shadow-md h-full">
                         {project.image_url && (
                           <div className="aspect-video overflow-hidden relative">
-                            <img src={project.image_url} alt={project.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                            <SmartImage src={project.image_url} alt={project.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                             <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                           </div>
                         )}
@@ -260,7 +261,7 @@ const Home = () => {
                             <p className="text-foreground/80 leading-relaxed mb-6 italic">"{language === 'en' ? (t.quote_en || t.quote_vi) : t.quote_vi}"</p>
                             <div className="flex items-center gap-3">
                               {t.avatar_url ? (
-                                <img src={t.avatar_url} alt={t.name} className="w-12 h-12 rounded-full object-cover border-2 border-secondary/20" />
+                                <SmartImage src={t.avatar_url} alt={t.name} className="w-12 h-12 rounded-full object-cover border-2 border-secondary/20" />
                               ) : (
                                 <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-2xl">👤</div>
                               )}
@@ -302,7 +303,7 @@ const Home = () => {
                           <Card className="card-premium h-full border-0 shadow-md overflow-hidden">
                             {post.image_url && (
                               <div className="aspect-video overflow-hidden">
-                                <img src={post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                <SmartImage src={post.image_url} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                               </div>
                             )}
                             <CardContent className="p-6">

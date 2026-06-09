@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import SmartImage from '@/components/SmartImage';
 import { useLanguage } from '@/lib/i18n';
 import { usePostBySlug, usePublishedPosts, useAllCategories } from '@/hooks/useBlog';
 import Navigation from '@/components/Navigation';
@@ -125,7 +126,7 @@ const BlogPost = () => {
         {/* Hero */}
         {post.image_url ? (
           <div className="relative w-full h-[45vh] md:h-[55vh] overflow-hidden">
-            <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" />
+            <SmartImage src={post.image_url} alt={post.title} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/10" />
           </div>
         ) : (
@@ -245,7 +246,7 @@ const BlogPost = () => {
                     <article>
                       <div className="aspect-[16/10] rounded-xl overflow-hidden mb-4 bg-muted">
                         {rp.image_url ? (
-                          <img src={rp.image_url} alt={rp.title}
+                          <SmartImage src={rp.image_url} alt={rp.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
@@ -281,7 +282,7 @@ const BlogPost = () => {
                     <article>
                       <div className="aspect-[16/10] rounded-xl overflow-hidden mb-4 bg-muted">
                         {mp.image_url ? (
-                          <img src={mp.image_url} alt={mp.title}
+                          <SmartImage src={mp.image_url} alt={mp.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
