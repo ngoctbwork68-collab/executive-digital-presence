@@ -38,13 +38,29 @@ export default function MediaLibrary() {
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
-      const file = event.target.files?.[0];
-      if (!file) return;
-      if (file.size > 10 * 1024 * 1024) { toast.error('File size must be less than 10MB'); return; }
+      const original = event.target.files?.[0];
+      if (!original) return;
+      if (original.size > 10 * 1024 * 1024) { toast.error('File size must be less than 10MB'); return; }
       setUploading(true);
+
+      let file = original;
+      let report: OptimizeReport | null = null;
+      if (original.type.startsWith('image/')) {
+        try {
+          report = await optimizeImage(original, { maxDimension: 1920, quality: 0.82, preferAvif: true });
+          if (report.optimized) {
+            file = report.file;
+            toast.success(`Đã tối ưu ảnh: ${formatBytes(report.originalSize)} → ${formatBytes(report.newSize)} (-${report.savedPct}%)`);
+          }
+        } catch (err) {
+          console.warn('Optimization skipped:', err);
+        }
+      }
+      setLastReport(report);
+
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from('portfolio-media').upload(fileName, file);
+      const { error: uploadError } = await supabase.storage.from('portfolio-media').upload(fileName, file, { contentType: file.type });
       if (uploadError) throw uploadError;
       const { data: { publicUrl } } = supabase.storage.from('portfolio-media').getPublicUrl(fileName);
       await createMediaItem.mutateAsync({ filename: file.name, url: publicUrl, file_type: file.type, file_size: file.size });
