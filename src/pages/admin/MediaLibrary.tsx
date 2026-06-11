@@ -8,9 +8,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Edit, Copy, Check, Image as ImageIcon, Video, FileText, Upload, Loader2 } from 'lucide-react';
+import { Trash2, Edit, Copy, Check, Image as ImageIcon, Video, FileText, Upload, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import type { MediaItem } from '@/lib/supabase/media';
+import { optimizeImage, formatBytes, type OptimizeReport } from '@/lib/imageOptimizer';
 
 export default function MediaLibrary() {
   const { data: media = [], isLoading } = useAllMedia();
