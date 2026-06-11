@@ -141,8 +141,22 @@ export const MediaUpload = ({
       
       {!preview && !uploading && (
         <p className="text-sm text-muted-foreground">
-          Accepted: Images & Videos (max {maxSizeMB}MB)
+          Accepted: Images & Videos (max {maxSizeMB}MB). Ảnh sẽ tự động resize ≤1920px và chuyển WebP/AVIF.
         </p>
+      )}
+
+      {lastReport && lastReport.optimized && (
+        <div className="text-xs flex items-center gap-1.5 text-primary">
+          <Sparkles className="h-3 w-3" />
+          <span>
+            Đã tối ưu: {formatBytes(lastReport.originalSize)} → {formatBytes(lastReport.newSize)}
+            {' '}(-{lastReport.savedPct}%)
+            {lastReport.newDimensions && `, ${lastReport.newDimensions.w}×${lastReport.newDimensions.h}, ${lastReport.newType.replace('image/', '').toUpperCase()}`}
+          </span>
+        </div>
+      )}
+      {lastReport && !lastReport.optimized && lastReport.skipped && lastReport.skipped !== 'unsupported-format' && (
+        <p className="text-xs text-muted-foreground">Ảnh đã đủ nhẹ — không cần tối ưu thêm.</p>
       )}
     </div>
   );
