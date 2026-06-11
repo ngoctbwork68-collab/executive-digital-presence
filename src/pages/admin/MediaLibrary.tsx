@@ -144,7 +144,20 @@ export default function MediaLibrary() {
             <Input id="file-upload" type="file" accept="image/*,video/*" onChange={handleUpload} disabled={uploading} className="max-w-md" />
             {uploading && <Loader2 className="h-5 w-5 animate-spin" />}
           </div>
-          <p className="text-sm text-muted-foreground mt-2">Accepted: Images & Videos (max 10MB)</p>
+          <p className="text-sm text-muted-foreground mt-2">Accepted: Images & Videos (max 10MB). Ảnh tự động resize ≤1920px và chuyển sang WebP/AVIF để đồng đều, nhẹ tải.</p>
+          {lastReport && lastReport.optimized && (
+            <div className="mt-3 flex items-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-sm text-primary">
+              <Sparkles className="h-4 w-4" />
+              <span>
+                Đã tối ưu ảnh gần nhất: {formatBytes(lastReport.originalSize)} → {formatBytes(lastReport.newSize)} (-{lastReport.savedPct}%)
+                {lastReport.newDimensions && `, ${lastReport.newDimensions.w}×${lastReport.newDimensions.h}`}
+                , định dạng {lastReport.newType.replace('image/', '').toUpperCase()}.
+              </span>
+            </div>
+          )}
+          {lastReport && !lastReport.optimized && lastReport.skipped === 'no-gain' && (
+            <p className="mt-2 text-xs text-muted-foreground">Ảnh đã đủ nhẹ — giữ nguyên bản gốc.</p>
+          )}
         </CardContent>
       </Card>
 
