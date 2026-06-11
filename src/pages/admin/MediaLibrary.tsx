@@ -8,9 +8,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Edit, Copy, Check, Image as ImageIcon, Video, FileText, Upload, Loader2 } from 'lucide-react';
+import { Trash2, Edit, Copy, Check, Image as ImageIcon, Video, FileText, Upload, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import type { MediaItem } from '@/lib/supabase/media';
+import { optimizeImage, formatBytes, type OptimizeReport } from '@/lib/imageOptimizer';
 
 export default function MediaLibrary() {
   const { data: media = [], isLoading } = useAllMedia();
@@ -23,6 +24,7 @@ export default function MediaLibrary() {
   const [editingMedia, setEditingMedia] = useState<MediaItem | null>(null);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [lastReport, setLastReport] = useState<OptimizeReport | null>(null);
   const [editFormData, setEditFormData] = useState({ alt_text_en: '', alt_text_vi: '' });
 
   const filteredMedia = media.filter((item) => {
@@ -36,13 +38,29 @@ export default function MediaLibrary() {
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
-      const file = event.target.files?.[0];
-      if (!file) return;
-      if (file.size > 10 * 1024 * 1024) { toast.error('File size must be less than 10MB'); return; }
+      const original = event.target.files?.[0];
+      if (!original) return;
+      if (original.size > 10 * 1024 * 1024) { toast.error('File size must be less than 10MB'); return; }
       setUploading(true);
+
+      let file = original;
+      let report: OptimizeReport | null = null;
+      if (original.type.startsWith('image/')) {
+        try {
+          report = await optimizeImage(original, { maxDimension: 1920, quality: 0.82, preferAvif: true });
+          if (report.optimized) {
+            file = report.file;
+            toast.success(`Đã tối ưu ảnh: ${formatBytes(report.originalSize)} → ${formatBytes(report.newSize)} (-${report.savedPct}%)`);
+          }
+        } catch (err) {
+          console.warn('Optimization skipped:', err);
+        }
+      }
+      setLastReport(report);
+
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from('portfolio-media').upload(fileName, file);
+      const { error: uploadError } = await supabase.storage.from('portfolio-media').upload(fileName, file, { contentType: file.type });
       if (uploadError) throw uploadError;
       const { data: { publicUrl } } = supabase.storage.from('portfolio-media').getPublicUrl(fileName);
       await createMediaItem.mutateAsync({ filename: file.name, url: publicUrl, file_type: file.type, file_size: file.size });
@@ -126,7 +144,20 @@ export default function MediaLibrary() {
             <Input id="file-upload" type="file" accept="image/*,video/*" onChange={handleUpload} disabled={uploading} className="max-w-md" />
             {uploading && <Loader2 className="h-5 w-5 animate-spin" />}
           </div>
-          <p className="text-sm text-muted-foreground mt-2">Accepted: Images & Videos (max 10MB)</p>
+          <p className="text-sm text-muted-foreground mt-2">Accepted: Images & Videos (max 10MB). Ảnh tự động resize ≤1920px và chuyển sang WebP/AVIF để đồng đều, nhẹ tải.</p>
+          {lastReport && lastReport.optimized && (
+            <div className="mt-3 flex items-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-sm text-primary">
+              <Sparkles className="h-4 w-4" />
+              <span>
+                Đã tối ưu ảnh gần nhất: {formatBytes(lastReport.originalSize)} → {formatBytes(lastReport.newSize)} (-{lastReport.savedPct}%)
+                {lastReport.newDimensions && `, ${lastReport.newDimensions.w}×${lastReport.newDimensions.h}`}
+                , định dạng {lastReport.newType.replace('image/', '').toUpperCase()}.
+              </span>
+            </div>
+          )}
+          {lastReport && !lastReport.optimized && lastReport.skipped === 'no-gain' && (
+            <p className="mt-2 text-xs text-muted-foreground">Ảnh đã đủ nhẹ — giữ nguyên bản gốc.</p>
+          )}
         </CardContent>
       </Card>
 

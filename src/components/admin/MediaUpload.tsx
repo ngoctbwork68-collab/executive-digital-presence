@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Upload, X, Loader2 } from 'lucide-react';
+import { Upload, X, Loader2, Sparkles } from 'lucide-react';
+import { optimizeImage, formatBytes, type OptimizeReport } from '@/lib/imageOptimizer';
 
 interface MediaUploadProps {
   value?: string;
@@ -23,6 +24,7 @@ export const MediaUpload = ({
 }: MediaUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(value || null);
+  const [lastReport, setLastReport] = useState<OptimizeReport | null>(null);
 
   // Sync preview with value prop changes (e.g. when data loads from DB)
   React.useEffect(() => {
@@ -31,16 +33,34 @@ export const MediaUpload = ({
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
-      const file = event.target.files?.[0];
-      if (!file) return;
+      const original = event.target.files?.[0];
+      if (!original) return;
 
       // Check file size
-      if (file.size > maxSizeMB * 1024 * 1024) {
+      if (original.size > maxSizeMB * 1024 * 1024) {
         toast.error(`File size must be less than ${maxSizeMB}MB`);
         return;
       }
 
       setUploading(true);
+
+      // Auto-optimize images before upload (resize + WebP/AVIF)
+      let file = original;
+      let report: OptimizeReport | null = null;
+      if (original.type.startsWith('image/')) {
+        try {
+          report = await optimizeImage(original, { maxDimension: 1920, quality: 0.82, preferAvif: true });
+          if (report.optimized) {
+            file = report.file;
+            toast.success(
+              `Optimized: ${formatBytes(report.originalSize)} → ${formatBytes(report.newSize)} (-${report.savedPct}%)`
+            );
+          }
+        } catch (err) {
+          console.warn('Image optimization skipped:', err);
+        }
+      }
+      setLastReport(report);
 
       // Generate unique filename
       const fileExt = file.name.split('.').pop();
@@ -50,7 +70,7 @@ export const MediaUpload = ({
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('portfolio-media')
-        .upload(filePath, file);
+        .upload(filePath, file, { contentType: file.type });
 
       if (uploadError) throw uploadError;
 
@@ -121,8 +141,22 @@ export const MediaUpload = ({
       
       {!preview && !uploading && (
         <p className="text-sm text-muted-foreground">
-          Accepted: Images & Videos (max {maxSizeMB}MB)
+          Accepted: Images & Videos (max {maxSizeMB}MB). Ảnh sẽ tự động resize ≤1920px và chuyển WebP/AVIF.
         </p>
+      )}
+
+      {lastReport && lastReport.optimized && (
+        <div className="text-xs flex items-center gap-1.5 text-primary">
+          <Sparkles className="h-3 w-3" />
+          <span>
+            Đã tối ưu: {formatBytes(lastReport.originalSize)} → {formatBytes(lastReport.newSize)}
+            {' '}(-{lastReport.savedPct}%)
+            {lastReport.newDimensions && `, ${lastReport.newDimensions.w}×${lastReport.newDimensions.h}, ${lastReport.newType.replace('image/', '').toUpperCase()}`}
+          </span>
+        </div>
+      )}
+      {lastReport && !lastReport.optimized && lastReport.skipped && lastReport.skipped !== 'unsupported-format' && (
+        <p className="text-xs text-muted-foreground">Ảnh đã đủ nhẹ — không cần tối ưu thêm.</p>
       )}
     </div>
   );
