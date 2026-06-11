@@ -24,6 +24,7 @@ export default function MediaLibrary() {
   const [editingMedia, setEditingMedia] = useState<MediaItem | null>(null);
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [lastReport, setLastReport] = useState<OptimizeReport | null>(null);
   const [editFormData, setEditFormData] = useState({ alt_text_en: '', alt_text_vi: '' });
 
   const filteredMedia = media.filter((item) => {
