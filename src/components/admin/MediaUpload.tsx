@@ -24,6 +24,7 @@ export const MediaUpload = ({
 }: MediaUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(value || null);
+  const [lastReport, setLastReport] = useState<OptimizeReport | null>(null);
 
   // Sync preview with value prop changes (e.g. when data loads from DB)
   React.useEffect(() => {
