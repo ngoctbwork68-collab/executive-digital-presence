@@ -85,7 +85,7 @@ if (typeof window !== "undefined" && persister) {
   queryClient.getMutationCache().subscribe((event) => {
     if (event?.type === "updated" && event.mutation?.state.status === "success") {
       // ép persist ngay (không chờ throttle)
-      persister.persistClient({
+      void Promise.resolve(persister.persistClient({
         buster: "v1",
         timestamp: Date.now(),
         clientState: {
@@ -96,7 +96,7 @@ if (typeof window !== "undefined" && persister) {
             state: q.state,
           })) as never,
         },
-      }).catch(() => {});
+      })).catch(() => {});
       // bump version → các tab khác nghe storage event sẽ invalidate
       try {
         localStorage.setItem(SNAPSHOT_VERSION_KEY, String(Date.now()));
