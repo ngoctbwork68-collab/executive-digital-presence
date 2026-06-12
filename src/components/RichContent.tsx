@@ -65,8 +65,16 @@ const RichContent = ({ html, className, id }: RichContentProps) => {
       img.decoding = 'async';
       img.referrerPolicy = 'no-referrer';
 
-      // Proxy external images through wsrv.nl so hotlink-protected hosts
-      // (Facebook scontent CDN, etc.) still render, and gain WebP compression.
+      // Reserve space to avoid layout shift / "broken ratio" feel
+      if (!img.style.aspectRatio && !img.getAttribute('width')) {
+        img.style.aspectRatio = '16 / 9';
+        img.style.width = '100%';
+        img.style.height = 'auto';
+        img.style.objectFit = 'cover';
+        img.style.background = 'hsl(var(--muted))';
+        img.style.borderRadius = '1rem';
+      }
+
       const originalSrc = img.getAttribute('src') || '';
       const isExternal =
         /^https?:\/\//i.test(originalSrc) &&
@@ -74,13 +82,25 @@ const RichContent = ({ html, className, id }: RichContentProps) => {
         !/wsrv\.nl\//i.test(originalSrc) &&
         !/^data:/i.test(originalSrc);
       if (isExternal) {
-        const proxied = `https://wsrv.nl/?url=${encodeURIComponent(originalSrc)}&output=webp&we`;
+        // Proxy + normalize: WebP, max width 1600, on error try original
+        const proxied = `https://wsrv.nl/?url=${encodeURIComponent(originalSrc)}&output=webp&w=1600&we`;
         img.setAttribute('data-original-src', originalSrc);
         img.src = proxied;
       }
 
+      // Validate dimensions once loaded — if natural size is suspiciously tiny
+      // or fails to decode, swap for placeholder.
+      const handleLoad = () => {
+        if (img.naturalWidth < 32 || img.naturalHeight < 32) {
+          handleError();
+          return;
+        }
+        // Update aspect ratio to real ratio once known (prevents distortion)
+        img.style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+        img.style.objectFit = 'contain';
+      };
+
       const handleError = () => {
-        // First fallback: try the original (un-proxied) URL once
         const orig = img.getAttribute('data-original-src');
         if (orig && img.src !== orig) {
           img.removeAttribute('data-original-src');
@@ -94,10 +114,15 @@ const RichContent = ({ html, className, id }: RichContentProps) => {
           '<div class="flex flex-col items-center gap-2 text-sm opacity-70"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 2 20 20"/><path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"/><path d="M13.5 13.5 6 21h12a2 2 0 0 0 2-2v-5.5"/><path d="M18 12V5a2 2 0 0 0-2-2H9.5"/></svg><span>Image unavailable</span></div>';
         img.replaceWith(placeholder);
       };
+      img.addEventListener('load', handleLoad);
       img.addEventListener('error', handleError);
-      if (img.complete && img.naturalWidth === 0) handleError();
+      if (img.complete) {
+        if (img.naturalWidth === 0) handleError();
+        else handleLoad();
+      }
     });
   }, [processed]);
+
 
   if (!processed) return null;
 
