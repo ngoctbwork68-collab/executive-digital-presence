@@ -82,8 +82,20 @@ const PageFallback = () => (
   </div>
 );
 
+const Providers = ({ children }: { children: React.ReactNode }) =>
+  persister ? (
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{ persister, maxAge: 24 * 60 * 60 * 1000, buster: "v1" }}
+    >
+      {children}
+    </PersistQueryClientProvider>
+  ) : (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  <Providers>
     <TooltipProvider>
       <Toaster />
       <Sonner />
