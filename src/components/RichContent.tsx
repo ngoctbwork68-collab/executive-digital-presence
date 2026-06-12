@@ -64,7 +64,29 @@ const RichContent = ({ html, className, id }: RichContentProps) => {
       img.loading = 'lazy';
       img.decoding = 'async';
       img.referrerPolicy = 'no-referrer';
+
+      // Proxy external images through wsrv.nl so hotlink-protected hosts
+      // (Facebook scontent CDN, etc.) still render, and gain WebP compression.
+      const originalSrc = img.getAttribute('src') || '';
+      const isExternal =
+        /^https?:\/\//i.test(originalSrc) &&
+        !/supabase\.co\//i.test(originalSrc) &&
+        !/wsrv\.nl\//i.test(originalSrc) &&
+        !/^data:/i.test(originalSrc);
+      if (isExternal) {
+        const proxied = `https://wsrv.nl/?url=${encodeURIComponent(originalSrc)}&output=webp&we`;
+        img.setAttribute('data-original-src', originalSrc);
+        img.src = proxied;
+      }
+
       const handleError = () => {
+        // First fallback: try the original (un-proxied) URL once
+        const orig = img.getAttribute('data-original-src');
+        if (orig && img.src !== orig) {
+          img.removeAttribute('data-original-src');
+          img.src = orig;
+          return;
+        }
         const placeholder = document.createElement('div');
         placeholder.className =
           'flex items-center justify-center w-full aspect-[16/9] my-6 rounded-2xl bg-muted text-muted-foreground border border-dashed border-border';
