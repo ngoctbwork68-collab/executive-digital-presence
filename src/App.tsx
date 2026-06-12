@@ -148,7 +148,7 @@ const App = () => (
         <FontThemeApplier />
       </BrowserRouter>
     </TooltipProvider>
-  </QueryClientProvider>
+  </Providers>
 );
 
 export default App;
