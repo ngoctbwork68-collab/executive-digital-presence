@@ -68,13 +68,49 @@ const queryClient = new QueryClient({
 });
 
 // Persist toàn bộ React Query cache vào localStorage để vào lại trang là hiển thị tức thì
+const SNAPSHOT_KEY = "app-query-cache-v1";
+const SNAPSHOT_VERSION_KEY = "app-query-cache-version";
+
 const persister = typeof window !== "undefined"
   ? createSyncStoragePersister({
       storage: window.localStorage,
-      key: "app-query-cache-v1",
-      throttleTime: 1000,
+      key: SNAPSHOT_KEY,
+      throttleTime: 200, // ghi snapshot gần như tức thì
     })
   : undefined;
+
+// Snapshot ngay lập tức sau MỌI mutation thành công (admin chỉnh sửa)
+// → frontend ở tab khác / lần load sau luôn nhận bản mới nhất
+if (typeof window !== "undefined" && persister) {
+  queryClient.getMutationCache().subscribe((event) => {
+    if (event?.type === "updated" && event.mutation?.state.status === "success") {
+      // ép persist ngay (không chờ throttle)
+      void Promise.resolve(persister.persistClient({
+        buster: "v1",
+        timestamp: Date.now(),
+        clientState: {
+          mutations: [],
+          queries: queryClient.getQueryCache().getAll().map((q) => ({
+            queryKey: q.queryKey,
+            queryHash: q.queryHash,
+            state: q.state,
+          })) as never,
+        },
+      })).catch(() => {});
+      // bump version → các tab khác nghe storage event sẽ invalidate
+      try {
+        localStorage.setItem(SNAPSHOT_VERSION_KEY, String(Date.now()));
+      } catch {}
+    }
+  });
+
+  // Lắng nghe thay đổi snapshot từ tab/admin khác → invalidate để hiển thị bản mới
+  window.addEventListener("storage", (e) => {
+    if (e.key === SNAPSHOT_VERSION_KEY) {
+      queryClient.invalidateQueries();
+    }
+  });
+}
 
 const PageFallback = () => (
   <div className="min-h-[60vh] flex items-center justify-center">
