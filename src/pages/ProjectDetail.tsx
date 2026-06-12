@@ -56,17 +56,26 @@ const ProjectDetail = () => {
 
       {/* Premium Hero Image */}
       {project.image_url && (
-        <div className="relative w-full h-[45vh] md:h-[60vh] overflow-hidden">
+        <div className="relative w-full aspect-[21/9] md:aspect-[21/8] max-h-[60vh] overflow-hidden bg-muted">
           <img
             src={project.image_url}
             alt={project.title}
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
             className="w-full h-full object-cover scale-105 animate-fade-in"
             style={{ objectPosition: 'center 30%' }}
+            onLoad={(e) => {
+              const i = e.currentTarget;
+              if (i.naturalWidth < 32 || i.naturalHeight < 32) i.style.display = 'none';
+            }}
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/10" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/30 to-transparent" />
         </div>
       )}
+
 
       <section className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
