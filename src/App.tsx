@@ -58,14 +58,23 @@ const BookingsManager = lazy(() => import("./pages/admin/BookingsManager"));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 min — avoid refetching on every nav
-      gcTime: 30 * 60 * 1000,
+      staleTime: 5 * 60 * 1000,
+      gcTime: 24 * 60 * 60 * 1000, // 24h — giữ trong cache lâu để persist hữu ích
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       retry: 1,
     },
   },
 });
+
+// Persist toàn bộ React Query cache vào localStorage để vào lại trang là hiển thị tức thì
+const persister = typeof window !== "undefined"
+  ? createSyncStoragePersister({
+      storage: window.localStorage,
+      key: "app-query-cache-v1",
+      throttleTime: 1000,
+    })
+  : undefined;
 
 const PageFallback = () => (
   <div className="min-h-[60vh] flex items-center justify-center">
