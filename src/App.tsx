@@ -55,17 +55,26 @@ const ChatbotManager = lazy(() => import("./pages/admin/ChatbotManager"));
 const SectionsOrderManager = lazy(() => import("./pages/admin/SectionsOrderManager"));
 const BookingsManager = lazy(() => import("./pages/admin/BookingsManager"));
 
+// Stale-While-Revalidate:
+// - Dữ liệu local từ localStorage persister được hiển thị TỨC THÌ.
+// - Mọi query luôn refetch ngầm ở nền khi component mount/route đổi.
+// - React Query structuralSharing giữ nguyên reference nếu data không đổi
+//   → component KHÔNG re-render, chỉ thay đổi khi server trả phiên bản mới.
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,
-      gcTime: 24 * 60 * 60 * 1000, // 24h — giữ trong cache lâu để persist hữu ích
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
+      staleTime: 0,                  // luôn coi là stale → revalidate ngầm
+      gcTime: 24 * 60 * 60 * 1000,   // giữ 24h để persist hữu ích
+      refetchOnMount: "always",      // mount lại → fetch nền, vẫn show cache ngay
+      refetchOnReconnect: "always",  // online lại → đồng bộ
+      refetchOnWindowFocus: false,   // tránh spam khi switch tab
       retry: 1,
+      structuralSharing: true,       // chỉ đổi reference khi data thực sự khác
+      networkMode: "offlineFirst",   // có cache thì dùng cache, không chờ network
     },
   },
 });
+
 
 // Persist toàn bộ React Query cache vào localStorage để vào lại trang là hiển thị tức thì
 const SNAPSHOT_BUSTER = "v2-2026-06-26"; // bump để xóa snapshot mockup cũ
