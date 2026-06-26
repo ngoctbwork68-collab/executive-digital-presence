@@ -68,47 +68,60 @@ const queryClient = new QueryClient({
 });
 
 // Persist toàn bộ React Query cache vào localStorage để vào lại trang là hiển thị tức thì
-const SNAPSHOT_KEY = "app-query-cache-v1";
+const SNAPSHOT_BUSTER = "v2-2026-06-26"; // bump để xóa snapshot mockup cũ
+const SNAPSHOT_KEY = "app-query-cache-v2";
 const SNAPSHOT_VERSION_KEY = "app-query-cache-version";
+const OLD_SNAPSHOT_KEYS = ["app-query-cache-v1", "REACT_QUERY_OFFLINE_CACHE"];
+
+// Dọn các snapshot cũ (mockup lỗi) ngay khi app khởi động
+if (typeof window !== "undefined") {
+  try {
+    OLD_SNAPSHOT_KEYS.forEach((k) => localStorage.removeItem(k));
+  } catch {}
+}
 
 const persister = typeof window !== "undefined"
   ? createSyncStoragePersister({
       storage: window.localStorage,
       key: SNAPSHOT_KEY,
-      throttleTime: 200, // ghi snapshot gần như tức thì
+      throttleTime: 200,
     })
   : undefined;
 
-// Snapshot ngay lập tức sau MỌI mutation thành công (admin chỉnh sửa)
-// → frontend ở tab khác / lần load sau luôn nhận bản mới nhất
 if (typeof window !== "undefined" && persister) {
-  queryClient.getMutationCache().subscribe((event) => {
-    if (event?.type === "updated" && event.mutation?.state.status === "success") {
-      // ép persist ngay (không chờ throttle)
-      void Promise.resolve(persister.persistClient({
-        buster: "v1",
-        timestamp: Date.now(),
-        clientState: {
-          mutations: [],
-          queries: queryClient.getQueryCache().getAll().map((q) => ({
-            queryKey: q.queryKey,
-            queryHash: q.queryHash,
-            state: q.state,
-          })) as never,
-        },
-      })).catch(() => {});
-      // bump version → các tab khác nghe storage event sẽ invalidate
-      try {
-        localStorage.setItem(SNAPSHOT_VERSION_KEY, String(Date.now()));
-      } catch {}
+  const writeSnapshot = () => {
+    void Promise.resolve(persister.persistClient({
+      buster: SNAPSHOT_BUSTER,
+      timestamp: Date.now(),
+      clientState: {
+        mutations: [],
+        queries: queryClient.getQueryCache().getAll().map((q) => ({
+          queryKey: q.queryKey,
+          queryHash: q.queryHash,
+          state: q.state,
+        })) as never,
+      },
+    })).catch(() => {});
+  };
+
+  // Snapshot ngay khi MỖI query fetch thành công → lần load sau hiện tức thì
+  queryClient.getQueryCache().subscribe((event) => {
+    if (event?.type === "updated" && event.query.state.status === "success") {
+      writeSnapshot();
     }
   });
 
-  // Lắng nghe thay đổi snapshot từ tab/admin khác → invalidate để hiển thị bản mới
-  window.addEventListener("storage", (e) => {
-    if (e.key === SNAPSHOT_VERSION_KEY) {
-      queryClient.invalidateQueries();
+  // Snapshot + bump version sau mỗi mutation thành công (admin chỉnh sửa)
+  queryClient.getMutationCache().subscribe((event) => {
+    if (event?.type === "updated" && event.mutation?.state.status === "success") {
+      writeSnapshot();
+      try { localStorage.setItem(SNAPSHOT_VERSION_KEY, String(Date.now())); } catch {}
     }
+  });
+
+  // Tab khác cập nhật → invalidate để hiển thị bản mới
+  window.addEventListener("storage", (e) => {
+    if (e.key === SNAPSHOT_VERSION_KEY) queryClient.invalidateQueries();
   });
 }
 
@@ -122,13 +135,14 @@ const Providers = ({ children }: { children: React.ReactNode }) =>
   persister ? (
     <PersistQueryClientProvider
       client={queryClient}
-      persistOptions={{ persister, maxAge: 24 * 60 * 60 * 1000, buster: "v1" }}
+      persistOptions={{ persister, maxAge: 24 * 60 * 60 * 1000, buster: SNAPSHOT_BUSTER }}
     >
       {children}
     </PersistQueryClientProvider>
   ) : (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
+
 
 const App = () => (
   <Providers>
