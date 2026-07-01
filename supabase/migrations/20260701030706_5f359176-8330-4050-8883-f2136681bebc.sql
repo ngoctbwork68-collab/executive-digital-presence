@@ -1,0 +1,1 @@
+update public.social_links set provider='linkedin' where url ilike '%linkedin.com%' and lower(provider) <> 'linkedin';
