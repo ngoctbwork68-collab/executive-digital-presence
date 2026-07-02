@@ -51,6 +51,7 @@ const menuGroups = [
       { path: '/admin/chatbot', icon: Bot, label: 'Chatbot' },
       { path: '/admin/custom-sections', icon: Blocks, label: 'Custom Sections' },
       { path: '/admin/media', icon: Image, label: 'Thư viện' },
+      { path: '/admin/loading-screen', icon: Loader2, label: 'Trang Loading' },
       { path: '/admin/settings', icon: Settings, label: 'Cài đặt' },
     ],
   },
