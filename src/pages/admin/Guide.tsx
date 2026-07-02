@@ -221,6 +221,12 @@ const PAGES = [
     fields: ['Logo', 'Favicon', 'Site name', 'Theme màu', 'Font', 'Header/Footer style', 'Bank info', 'Page heroes'],
     tips: 'Đổi theme màu áp dụng ngay realtime. Page heroes cho phép tùy biến tiêu đề và ảnh nền cho từng trang con.',
   },
+  {
+    icon: Sparkles, title: 'Trang Loading', path: '/admin/loading-screen', color: 'primary',
+    purpose: 'Tùy biến màn hình chờ hiển thị khi trang đang tải dữ liệu: ảnh nền, logo, tiêu đề, hiệu ứng và màu nhấn.',
+    fields: ['Ảnh nền', 'Logo', 'Tiêu đề', 'Phụ đề', 'Hiệu ứng (Ring/Dots/Wave/Pulse)', 'Overlay', 'Màu nhấn'],
+    tips: 'Chọn ảnh nền tối màu hoặc tăng overlay để chữ nổi rõ. Preview trực tiếp bên phải giúp căn chỉnh nhanh trước khi lưu.',
+  },
 ];
 
 const WORKFLOWS = [
