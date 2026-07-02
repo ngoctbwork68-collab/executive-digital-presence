@@ -111,12 +111,22 @@ const Spinner = ({ style, accent }: { style: LoadingConfig["style"]; accent?: st
   );
 };
 
-export default function LoadingScreen({ fullscreen = false }: { fullscreen?: boolean }) {
-  const [cfg, setCfg] = useState<LoadingConfig>(readCache);
+export default function LoadingScreen({
+  fullscreen = false,
+  override,
+}: {
+  fullscreen?: boolean;
+  override?: LoadingConfig;
+}) {
+  const [cfg, setCfg] = useState<LoadingConfig>(() => override ?? readCache());
 
   useEffect(() => {
+    if (override) {
+      setCfg(override);
+      return;
+    }
     fetchLoadingConfig().then(setCfg).catch(() => {});
-  }, []);
+  }, [override]);
 
   const overlay = Math.max(0, Math.min(100, cfg.overlay ?? 60)) / 100;
 
