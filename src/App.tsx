@@ -55,6 +55,7 @@ const CategoriesManager = lazy(() => import("./pages/admin/CategoriesManager"));
 const ChatbotManager = lazy(() => import("./pages/admin/ChatbotManager"));
 const SectionsOrderManager = lazy(() => import("./pages/admin/SectionsOrderManager"));
 const BookingsManager = lazy(() => import("./pages/admin/BookingsManager"));
+const LoadingScreenManager = lazy(() => import("./pages/admin/LoadingScreenManager"));
 
 // Stale-While-Revalidate:
 // - Dữ liệu local từ localStorage persister được hiển thị TỨC THÌ.
