@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import LoadingScreen from "./components/LoadingScreen";
 import ProtectedRoute from "./components/ProtectedRoute";
 import BackToTop from "./components/BackToTop";
 import ChatbotWidget from "./components/ChatbotWidget";
@@ -54,6 +54,7 @@ const CategoriesManager = lazy(() => import("./pages/admin/CategoriesManager"));
 const ChatbotManager = lazy(() => import("./pages/admin/ChatbotManager"));
 const SectionsOrderManager = lazy(() => import("./pages/admin/SectionsOrderManager"));
 const BookingsManager = lazy(() => import("./pages/admin/BookingsManager"));
+const LoadingScreenManager = lazy(() => import("./pages/admin/LoadingScreenManager"));
 
 // Stale-While-Revalidate:
 // - Dữ liệu local từ localStorage persister được hiển thị TỨC THÌ.
@@ -134,11 +135,7 @@ if (typeof window !== "undefined" && persister) {
   });
 }
 
-const PageFallback = () => (
-  <div className="min-h-[60vh] flex items-center justify-center">
-    <Loader2 className="h-6 w-6 animate-spin text-primary" />
-  </div>
-);
+const PageFallback = () => <LoadingScreen />;
 
 const Providers = ({ children }: { children: React.ReactNode }) =>
   persister ? (
@@ -196,6 +193,7 @@ const App = () => (
               <Route path="chatbot" element={<ChatbotManager />} />
               <Route path="sections-order" element={<SectionsOrderManager />} />
               <Route path="bookings" element={<BookingsManager />} />
+              <Route path="loading-screen" element={<LoadingScreenManager />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
