@@ -202,11 +202,6 @@ export default function LoadingScreenManager() {
   );
 }
 
-// Inline preview that mirrors LoadingScreen but uses local cfg (no fetch)
-const PreviewInline = ({ cfg }: { cfg: LoadingConfig }) => {
-  // reuse the exported component by writing to cache then remounting
-  useEffect(() => {
-    writeLoadingCache(cfg);
-  }, [cfg]);
-  return <LoadingScreen key={JSON.stringify(cfg)} />;
-};
+const PreviewInline = ({ cfg }: { cfg: LoadingConfig }) => (
+  <LoadingScreen override={cfg} />
+);
