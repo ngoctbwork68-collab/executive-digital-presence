@@ -194,6 +194,7 @@ const App = () => (
               <Route path="chatbot" element={<ChatbotManager />} />
               <Route path="sections-order" element={<SectionsOrderManager />} />
               <Route path="bookings" element={<BookingsManager />} />
+              <Route path="loading-screen" element={<LoadingScreenManager />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
