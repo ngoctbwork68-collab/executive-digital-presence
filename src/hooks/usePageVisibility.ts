@@ -14,6 +14,22 @@ const KEY_TO_PATH: Record<string, string> = {
   page_store: '/store',
 };
 
+export const normalizeHiddenPages = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === 'string');
+  }
+
+  if (value instanceof Set) {
+    return Array.from(value).filter((item): item is string => typeof item === 'string');
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.values(value).filter((item): item is string => typeof item === 'string');
+  }
+
+  return [];
+};
+
 export const usePageVisibility = () => {
   return useQuery({
     queryKey: ['page_visibility'],
@@ -33,6 +49,7 @@ export const usePageVisibility = () => {
       });
       return hidden;
     },
+    select: normalizeHiddenPages,
     staleTime: 30_000,
   });
 };

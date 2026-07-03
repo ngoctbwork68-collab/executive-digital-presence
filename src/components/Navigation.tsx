@@ -5,7 +5,7 @@ import { Menu, X, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
-import { usePageVisibility } from '@/hooks/usePageVisibility';
+import { normalizeHiddenPages, usePageVisibility } from '@/hooks/usePageVisibility';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { useLayoutSettings, type HeaderStyle } from '@/hooks/useLayoutSettings';
 import { cn } from '@/lib/utils';
@@ -29,9 +29,10 @@ const Navigation = () => {
   const { data: layoutSettings } = useLayoutSettings();
 
   const headerStyle: HeaderStyle = layoutSettings?.header_style || 'default';
+  const safeHiddenPages = normalizeHiddenPages(hiddenPages);
 
   const navItems = allNavItems.filter(item =>
-    item.path === '/' || !hiddenPages?.includes(item.path)
+    item.path === '/' || !safeHiddenPages.includes(item.path)
   );
 
   const isActive = (path: string) => location.pathname === path;
