@@ -4,7 +4,7 @@ import { Linkedin, Github, Twitter, Mail, ArrowUpRight, Facebook, Instagram, You
 import { useLanguage } from '@/lib/i18n';
 import { useProfile } from '@/hooks/useProfile';
 import { useSetting } from '@/hooks/useSettings';
-import { usePageVisibility } from '@/hooks/usePageVisibility';
+import { normalizeHiddenPages, usePageVisibility } from '@/hooks/usePageVisibility';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { useLayoutSettings, type FooterStyle } from '@/hooks/useLayoutSettings';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,7 +33,8 @@ const Footer = () => {
   const { data: layoutSettings } = useLayoutSettings();
 
   const footerStyle: FooterStyle = layoutSettings?.footer_style || 'default';
-  const quickLinks = allQuickLinks.filter(item => !hiddenPages?.includes(item.path));
+  const safeHiddenPages = normalizeHiddenPages(hiddenPages);
+  const quickLinks = allQuickLinks.filter(item => !safeHiddenPages.includes(item.path));
 
   const { data: socialLinks } = useQuery({
     queryKey: ['social_links'],
