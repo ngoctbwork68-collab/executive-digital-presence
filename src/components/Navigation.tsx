@@ -31,7 +31,7 @@ const Navigation = () => {
   const headerStyle: HeaderStyle = layoutSettings?.header_style || 'default';
 
   const navItems = allNavItems.filter(item =>
-    item.path === '/' || !hiddenPages?.has(item.path)
+    item.path === '/' || !hiddenPages?.includes(item.path)
   );
 
   const isActive = (path: string) => location.pathname === path;

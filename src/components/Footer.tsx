@@ -33,7 +33,7 @@ const Footer = () => {
   const { data: layoutSettings } = useLayoutSettings();
 
   const footerStyle: FooterStyle = layoutSettings?.footer_style || 'default';
-  const quickLinks = allQuickLinks.filter(item => !hiddenPages?.has(item.path));
+  const quickLinks = allQuickLinks.filter(item => !hiddenPages?.includes(item.path));
 
   const { data: socialLinks } = useQuery({
     queryKey: ['social_links'],
