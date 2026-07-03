@@ -8,12 +8,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { MediaUpload } from "@/components/admin/MediaUpload";
 import { toast } from "sonner";
-import { Loader2, Save, Eye, Sparkles, Image as ImageIcon, Palette } from "lucide-react";
+import { Loader2, Save, Eye, Sparkles, Image as ImageIcon, Palette, Plus, Trash2, Check } from "lucide-react";
 import LoadingScreen, {
   fetchLoadingConfig,
   writeLoadingCache,
-  LOADING_KEYS,
+  BUILTIN_PRESETS,
+  fetchCustomPresets,
+  fetchActivePresetId,
   type LoadingConfig,
+  type LoadingPreset,
 } from "@/components/LoadingScreen";
 
 const STYLES: { id: NonNullable<LoadingConfig["style"]>; label: string; desc: string }[] = [
@@ -23,6 +26,8 @@ const STYLES: { id: NonNullable<LoadingConfig["style"]>; label: string; desc: st
   { id: "pulse", label: "Pulse", desc: "Nhịp đập lan tỏa" },
 ];
 
+const uid = () => "p_" + Math.random().toString(36).slice(2, 9);
+
 export default function LoadingScreenManager() {
   const [cfg, setCfg] = useState<LoadingConfig>({
     title: "Đang tải nội dung…",
@@ -30,17 +35,44 @@ export default function LoadingScreenManager() {
     style: "ring",
     overlay: 60,
   });
+  const [customPresets, setCustomPresets] = useState<LoadingPreset[]>([]);
+  const [activeId, setActiveId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [previewKey, setPreviewKey] = useState(0);
 
   useEffect(() => {
-    fetchLoadingConfig()
-      .then((c) => setCfg((prev) => ({ ...prev, ...c })))
+    Promise.all([fetchLoadingConfig(), fetchCustomPresets(), fetchActivePresetId()])
+      .then(([c, presets, id]) => {
+        setCfg((prev) => ({ ...prev, ...c }));
+        setCustomPresets(presets);
+        setActiveId(id);
+      })
       .finally(() => setLoading(false));
   }, []);
 
   const patch = (p: Partial<LoadingConfig>) => setCfg((prev) => ({ ...prev, ...p }));
+
+  const applyPreset = (preset: LoadingPreset) => {
+    const { id, name, builtIn, ...rest } = preset;
+    patch(rest);
+    setActiveId(id);
+    toast.success(`Đã chọn preset: ${name}`);
+  };
+
+  const saveCurrentAsPreset = () => {
+    const name = prompt("Tên preset mới:");
+    if (!name) return;
+    const newPreset: LoadingPreset = { id: uid(), name, ...cfg };
+    setCustomPresets((p) => [...p, newPreset]);
+    setActiveId(newPreset.id);
+    toast.success("Đã tạo preset – nhớ bấm Lưu");
+  };
+
+  const deletePreset = (id: string) => {
+    setCustomPresets((p) => p.filter((x) => x.id !== id));
+    if (activeId === id) setActiveId("");
+  };
 
   const save = async () => {
     setSaving(true);
@@ -53,6 +85,8 @@ export default function LoadingScreenManager() {
         { key: "loading_style", value: cfg.style || "ring" },
         { key: "loading_overlay", value: String(cfg.overlay ?? 60) },
         { key: "loading_accent", value: cfg.accent || "" },
+        { key: "loading_active_preset", value: activeId || "" },
+        { key: "loading_custom_presets", value: JSON.stringify(customPresets) },
       ];
       const { error } = await supabase.from("settings").upsert(rows, { onConflict: "key" });
       if (error) throw error;
@@ -74,6 +108,8 @@ export default function LoadingScreenManager() {
     );
   }
 
+  const allPresets: LoadingPreset[] = [...BUILTIN_PRESETS, ...customPresets];
+
   return (
     <div className="space-y-6">
       <div>
@@ -85,6 +121,62 @@ export default function LoadingScreenManager() {
           Tùy biến màn hình chờ hiển thị khi đang tải dữ liệu từ database.
         </p>
       </div>
+
+      {/* Preset picker */}
+      <Card>
+        <CardContent className="p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold">Preset</h2>
+              <p className="text-xs text-muted-foreground">Chọn nhanh một chủ đề có sẵn hoặc lưu cấu hình hiện tại thành preset riêng.</p>
+            </div>
+            <Button size="sm" variant="outline" onClick={saveCurrentAsPreset}>
+              <Plus className="w-4 h-4 mr-1" /> Lưu preset hiện tại
+            </Button>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {allPresets.map((p) => {
+              const active = activeId === p.id;
+              return (
+                <div
+                  key={p.id}
+                  className={
+                    "group relative p-4 rounded-xl border cursor-pointer transition-all " +
+                    (active ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/40")
+                  }
+                  onClick={() => applyPreset(p)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="font-medium text-sm">{p.name}</div>
+                    {active && <Check className="w-4 h-4 text-primary" />}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1 line-clamp-1">{p.title}</div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-muted">{p.style}</span>
+                    {p.accent && (
+                      <span className="w-3 h-3 rounded-full border" style={{ background: p.accent }} />
+                    )}
+                    {p.builtIn ? (
+                      <span className="text-[10px] text-muted-foreground ml-auto">Mặc định</span>
+                    ) : (
+                      <button
+                        className="ml-auto text-destructive/70 hover:text-destructive opacity-0 group-hover:opacity-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deletePreset(p.id);
+                        }}
+                        title="Xóa preset"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid lg:grid-cols-[1fr_1.1fr] gap-6">
         {/* Editor */}
@@ -193,7 +285,7 @@ export default function LoadingScreenManager() {
           <div className="p-3 border-b bg-muted/40 text-xs font-medium text-muted-foreground uppercase tracking-wider">
             Xem trước trực tiếp
           </div>
-          <div key={previewKey} className="h-[520px]">
+          <div key={previewKey} className="h-[520px] relative">
             <PreviewInline cfg={cfg} />
           </div>
         </Card>
