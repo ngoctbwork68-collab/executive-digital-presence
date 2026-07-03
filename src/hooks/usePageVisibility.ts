@@ -24,11 +24,11 @@ export const usePageVisibility = () => {
         .in('key', PAGE_KEYS);
       if (error) throw error;
 
-      const hidden = new Set<string>();
+      const hidden: string[] = [];
       data?.forEach(item => {
         if (item.value === 'hidden') {
           const path = KEY_TO_PATH[item.key];
-          if (path) hidden.add(path);
+          if (path) hidden.push(path);
         }
       });
       return hidden;
