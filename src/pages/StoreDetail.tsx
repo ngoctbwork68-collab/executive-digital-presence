@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, ShoppingBag, Package, BookOpen, FileText, QrCode, Copy, Check, Minus, Plus, CheckCircle2, Smartphone, CreditCard, Ticket, X } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Package, BookOpen, FileText, QrCode, Copy, Check, Minus, Plus, CheckCircle2, Smartphone, CreditCard, Ticket, X, PlayCircle, ExternalLink, Clock, GraduationCap, BarChart3, User } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import RichContent from '@/components/RichContent';
 import { toast } from 'sonner';
@@ -168,6 +168,43 @@ export default function StoreDetail() {
               {product.description && (
                 <p className="text-muted-foreground leading-relaxed">{product.description}</p>
               )}
+
+              {/* Course / Ebook meta */}
+              {(product.product_type === 'course' || product.product_type === 'ebook') && (
+                <div className="flex flex-wrap gap-3 mt-4">
+                  {product.instructor && (
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <User size={14} className="text-primary" /> {product.instructor}
+                    </div>
+                  )}
+                  {product.duration && (
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <Clock size={14} className="text-primary" /> {product.duration}
+                    </div>
+                  )}
+                  {product.lessons_count ? (
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <GraduationCap size={14} className="text-primary" /> {product.lessons_count} bài học
+                    </div>
+                  ) : null}
+                  {product.level && (
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <BarChart3 size={14} className="text-primary" /> {product.level}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {product.preview_url && (
+                <a
+                  href={product.preview_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 mt-4 text-sm font-medium text-primary hover:underline"
+                >
+                  <PlayCircle size={16} /> Xem preview / giới thiệu
+                </a>
+              )}
             </div>
 
             {/* Price */}
@@ -221,15 +258,17 @@ export default function StoreDetail() {
               </div>
             )}
 
-            {/* Quantity */}
-            <div>
-              <p className="text-sm font-medium mb-2">Số lượng</p>
-              <div className="flex items-center gap-3">
-                <Button size="icon" variant="outline" onClick={() => setQuantity(Math.max(1, quantity - 1))}><Minus size={16} /></Button>
-                <span className="text-lg font-semibold w-12 text-center">{quantity}</span>
-                <Button size="icon" variant="outline" onClick={() => setQuantity(quantity + 1)}><Plus size={16} /></Button>
+            {/* Quantity - only for physical products */}
+            {product.product_type === 'product' && (
+              <div>
+                <p className="text-sm font-medium mb-2">Số lượng</p>
+                <div className="flex items-center gap-3">
+                  <Button size="icon" variant="outline" onClick={() => setQuantity(Math.max(1, quantity - 1))}><Minus size={16} /></Button>
+                  <span className="text-lg font-semibold w-12 text-center">{quantity}</span>
+                  <Button size="icon" variant="outline" onClick={() => setQuantity(quantity + 1)}><Plus size={16} /></Button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Voucher */}
             <div>
@@ -451,10 +490,25 @@ export default function StoreDetail() {
               </div>
             </div>
 
+            {/* Access link for courses/ebooks after payment */}
+            {(product.product_type === 'course' || product.product_type === 'ebook') && product.external_url && (
+              <a
+                href={product.external_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
+              >
+                <ExternalLink size={16} />
+                {product.product_type === 'course' ? 'Truy cập khóa học' : 'Mở tài liệu'}
+              </a>
+            )}
+
             {/* Footer note */}
             <div className="flex items-start gap-2 text-xs text-muted-foreground">
               <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5 text-secondary" />
-              <span>Sau khi chuyển khoản thành công, đơn hàng sẽ được xử lý trong vòng 24h. Liên hệ hotline nếu cần hỗ trợ.</span>
+              <span>{product.product_type === 'product'
+                ? 'Sau khi chuyển khoản thành công, đơn hàng sẽ được xử lý trong vòng 24h. Liên hệ hotline nếu cần hỗ trợ.'
+                : 'Sau khi chuyển khoản, vui lòng liên hệ để được cấp quyền truy cập vĩnh viễn. Link ở trên chỉ hiển thị demo — quyền truy cập chính thức được xác nhận thủ công.'}</span>
             </div>
           </div>
         </DialogContent>
