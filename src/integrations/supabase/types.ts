@@ -725,12 +725,18 @@ export type Database = {
           created_at: string | null
           description: string | null
           discount_percent: number | null
+          duration: string | null
+          external_url: string | null
           featured: boolean | null
           full_description: string | null
           id: string
           image_url: string | null
           images: string[] | null
+          instructor: string | null
+          lessons_count: number | null
+          level: string | null
           name: string
+          preview_url: string | null
           price: number
           product_type: string
           published: boolean | null
@@ -747,12 +753,18 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           discount_percent?: number | null
+          duration?: string | null
+          external_url?: string | null
           featured?: boolean | null
           full_description?: string | null
           id?: string
           image_url?: string | null
           images?: string[] | null
+          instructor?: string | null
+          lessons_count?: number | null
+          level?: string | null
           name: string
+          preview_url?: string | null
           price: number
           product_type?: string
           published?: boolean | null
@@ -769,12 +781,18 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           discount_percent?: number | null
+          duration?: string | null
+          external_url?: string | null
           featured?: boolean | null
           full_description?: string | null
           id?: string
           image_url?: string | null
           images?: string[] | null
+          instructor?: string | null
+          lessons_count?: number | null
+          level?: string | null
           name?: string
+          preview_url?: string | null
           price?: number
           product_type?: string
           published?: boolean | null
