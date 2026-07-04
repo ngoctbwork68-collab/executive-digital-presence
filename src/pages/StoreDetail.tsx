@@ -258,15 +258,17 @@ export default function StoreDetail() {
               </div>
             )}
 
-            {/* Quantity */}
-            <div>
-              <p className="text-sm font-medium mb-2">Số lượng</p>
-              <div className="flex items-center gap-3">
-                <Button size="icon" variant="outline" onClick={() => setQuantity(Math.max(1, quantity - 1))}><Minus size={16} /></Button>
-                <span className="text-lg font-semibold w-12 text-center">{quantity}</span>
-                <Button size="icon" variant="outline" onClick={() => setQuantity(quantity + 1)}><Plus size={16} /></Button>
+            {/* Quantity - only for physical products */}
+            {product.product_type === 'product' && (
+              <div>
+                <p className="text-sm font-medium mb-2">Số lượng</p>
+                <div className="flex items-center gap-3">
+                  <Button size="icon" variant="outline" onClick={() => setQuantity(Math.max(1, quantity - 1))}><Minus size={16} /></Button>
+                  <span className="text-lg font-semibold w-12 text-center">{quantity}</span>
+                  <Button size="icon" variant="outline" onClick={() => setQuantity(quantity + 1)}><Plus size={16} /></Button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Voucher */}
             <div>
