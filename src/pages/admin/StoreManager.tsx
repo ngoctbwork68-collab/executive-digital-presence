@@ -240,16 +240,73 @@ export default function StoreManager() {
                 <Input value={editing.brand || ''} onChange={e => setEditing({ ...editing, brand: e.target.value })} placeholder="Tên thương hiệu (tùy chọn)" />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Màu sắc (phân cách bằng dấu phẩy)</Label>
-                  <Input value={colorsInput} onChange={e => setColorsInput(e.target.value)} placeholder="Đỏ, Xanh, Đen" />
+              {(editing.product_type === 'product') && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Màu sắc (phân cách bằng dấu phẩy)</Label>
+                    <Input value={colorsInput} onChange={e => setColorsInput(e.target.value)} placeholder="Đỏ, Xanh, Đen" />
+                  </div>
+                  <div>
+                    <Label>Kích thước (phân cách bằng dấu phẩy)</Label>
+                    <Input value={sizesInput} onChange={e => setSizesInput(e.target.value)} placeholder="S, M, L, XL" />
+                  </div>
                 </div>
-                <div>
-                  <Label>Kích thước (phân cách bằng dấu phẩy)</Label>
-                  <Input value={sizesInput} onChange={e => setSizesInput(e.target.value)} placeholder="S, M, L, XL" />
+              )}
+
+              {(editing.product_type === 'course' || editing.product_type === 'ebook') && (
+                <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
+                  <p className="text-sm font-semibold flex items-center gap-2">
+                    {editing.product_type === 'course' ? <BookOpen size={14} /> : <FileText size={14} />}
+                    Thông tin {editing.product_type === 'course' ? 'khóa học' : 'tài liệu'}
+                  </p>
+                  <div>
+                    <Label>Liên kết truy cập (external URL) *</Label>
+                    <Input
+                      value={editing.external_url || ''}
+                      onChange={e => setEditing({ ...editing, external_url: e.target.value })}
+                      placeholder="https://drive.google.com/... hoặc https://udemy.com/..."
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">Link Google Drive, Udemy, YouTube playlist, Notion, PDF... Người mua sẽ nhận sau khi thanh toán.</p>
+                  </div>
+                  <div>
+                    <Label>Link preview / giới thiệu (tùy chọn)</Label>
+                    <Input
+                      value={editing.preview_url || ''}
+                      onChange={e => setEditing({ ...editing, preview_url: e.target.value })}
+                      placeholder="https://youtube.com/watch?v=..."
+                    />
+                  </div>
+                  {editing.product_type === 'course' && (
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <Label>Giảng viên</Label>
+                        <Input value={editing.instructor || ''} onChange={e => setEditing({ ...editing, instructor: e.target.value })} placeholder="Trần Bảo Ngọc" />
+                      </div>
+                      <div>
+                        <Label>Thời lượng</Label>
+                        <Input value={editing.duration || ''} onChange={e => setEditing({ ...editing, duration: e.target.value })} placeholder="8 giờ" />
+                      </div>
+                      <div>
+                        <Label>Số bài học</Label>
+                        <Input type="number" value={editing.lessons_count || 0} onChange={e => setEditing({ ...editing, lessons_count: parseInt(e.target.value) || 0 })} />
+                      </div>
+                    </div>
+                  )}
+                  <div>
+                    <Label>Cấp độ</Label>
+                    <Select value={editing.level || '_none'} onValueChange={v => setEditing({ ...editing, level: v === '_none' ? '' : v })}>
+                      <SelectTrigger><SelectValue placeholder="Chọn cấp độ" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="_none">-- Không --</SelectItem>
+                        <SelectItem value="Cơ bản">Cơ bản</SelectItem>
+                        <SelectItem value="Trung cấp">Trung cấp</SelectItem>
+                        <SelectItem value="Nâng cao">Nâng cao</SelectItem>
+                        <SelectItem value="Chuyên gia">Chuyên gia</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div>
                 <Label>Mô tả chi tiết (Rich Text)</Label>
