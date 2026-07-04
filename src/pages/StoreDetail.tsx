@@ -490,10 +490,25 @@ export default function StoreDetail() {
               </div>
             </div>
 
+            {/* Access link for courses/ebooks after payment */}
+            {(product.product_type === 'course' || product.product_type === 'ebook') && product.external_url && (
+              <a
+                href={product.external_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
+              >
+                <ExternalLink size={16} />
+                {product.product_type === 'course' ? 'Truy cập khóa học' : 'Mở tài liệu'}
+              </a>
+            )}
+
             {/* Footer note */}
             <div className="flex items-start gap-2 text-xs text-muted-foreground">
               <CheckCircle2 size={14} className="flex-shrink-0 mt-0.5 text-secondary" />
-              <span>Sau khi chuyển khoản thành công, đơn hàng sẽ được xử lý trong vòng 24h. Liên hệ hotline nếu cần hỗ trợ.</span>
+              <span>{product.product_type === 'product'
+                ? 'Sau khi chuyển khoản thành công, đơn hàng sẽ được xử lý trong vòng 24h. Liên hệ hotline nếu cần hỗ trợ.'
+                : 'Sau khi chuyển khoản, vui lòng liên hệ để được cấp quyền truy cập vĩnh viễn. Link ở trên chỉ hiển thị demo — quyền truy cập chính thức được xác nhận thủ công.'}</span>
             </div>
           </div>
         </DialogContent>
