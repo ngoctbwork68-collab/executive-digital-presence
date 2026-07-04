@@ -84,6 +84,15 @@ export default function Store() {
                 </Button>
               ))}
             </div>
+            <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
+              <SelectTrigger className="w-full md:w-[180px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">Nổi bật</SelectItem>
+                <SelectItem value="newest">Mới nhất</SelectItem>
+                <SelectItem value="price_asc">Giá tăng dần</SelectItem>
+                <SelectItem value="price_desc">Giá giảm dần</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Category chips */}
