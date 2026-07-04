@@ -10,7 +10,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, ShoppingBag, BookOpen, FileText, Package, Filter } from 'lucide-react';
+import { Search, ShoppingBag, BookOpen, FileText, Package, Filter, Clock, User, Sparkles, ExternalLink } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
 const PRODUCT_TYPES = [
@@ -25,15 +26,23 @@ export default function Store() {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [sortBy, setSortBy] = useState<'default' | 'price_asc' | 'price_desc' | 'newest'>('default');
 
   const { data: products, isLoading } = usePublishedProducts(typeFilter || undefined);
   const { data: categories } = useProductCategories();
 
-  const filtered = products?.filter(p => {
+  const filtered = (products?.filter(p => {
     if (search && !p.name.toLowerCase().includes(search.toLowerCase())) return false;
     if (categoryFilter && p.category_id !== categoryFilter) return false;
     return true;
-  }) || [];
+  }) || []).slice().sort((a, b) => {
+    if (sortBy === 'price_asc') return a.price - b.price;
+    if (sortBy === 'price_desc') return b.price - a.price;
+    if (sortBy === 'newest') return (b.created_at || '').localeCompare(a.created_at || '');
+    // default: featured first, then sort_order
+    if ((b.featured ? 1 : 0) !== (a.featured ? 1 : 0)) return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+    return (a.sort_order || 0) - (b.sort_order || 0);
+  });
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
