@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, ShoppingBag, Package, BookOpen, FileText, QrCode, Copy, Check, Minus, Plus, CheckCircle2, Smartphone, CreditCard, Ticket, X } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Package, BookOpen, FileText, QrCode, Copy, Check, Minus, Plus, CheckCircle2, Smartphone, CreditCard, Ticket, X, PlayCircle, ExternalLink, Clock, GraduationCap, BarChart3, User } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import RichContent from '@/components/RichContent';
 import { toast } from 'sonner';
@@ -167,6 +167,43 @@ export default function StoreDetail() {
               <h1 className="font-serif text-3xl font-bold mb-3">{product.name}</h1>
               {product.description && (
                 <p className="text-muted-foreground leading-relaxed">{product.description}</p>
+              )}
+
+              {/* Course / Ebook meta */}
+              {(product.product_type === 'course' || product.product_type === 'ebook') && (
+                <div className="flex flex-wrap gap-3 mt-4">
+                  {product.instructor && (
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <User size={14} className="text-primary" /> {product.instructor}
+                    </div>
+                  )}
+                  {product.duration && (
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <Clock size={14} className="text-primary" /> {product.duration}
+                    </div>
+                  )}
+                  {product.lessons_count ? (
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <GraduationCap size={14} className="text-primary" /> {product.lessons_count} bài học
+                    </div>
+                  ) : null}
+                  {product.level && (
+                    <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <BarChart3 size={14} className="text-primary" /> {product.level}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {product.preview_url && (
+                <a
+                  href={product.preview_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 mt-4 text-sm font-medium text-primary hover:underline"
+                >
+                  <PlayCircle size={16} /> Xem preview / giới thiệu
+                </a>
               )}
             </div>
 
