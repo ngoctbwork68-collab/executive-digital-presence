@@ -19,6 +19,12 @@ export interface Product {
   featured: boolean | null;
   published: boolean | null;
   sort_order: number | null;
+  external_url?: string | null;
+  preview_url?: string | null;
+  instructor?: string | null;
+  duration?: string | null;
+  level?: string | null;
+  lessons_count?: number | null;
   created_at: string | null;
   updated_at: string | null;
 }

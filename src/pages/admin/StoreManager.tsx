@@ -28,6 +28,7 @@ const emptyProduct: Partial<Product> = {
   name: '', slug: '', description: '', full_description: '', price: 0, discount_percent: 0,
   stock_quantity: 0, image_url: '', images: [], colors: [], sizes: [], brand: '',
   category_id: null, product_type: 'product', featured: false, published: false, sort_order: 0,
+  external_url: '', preview_url: '', instructor: '', duration: '', level: '', lessons_count: 0,
 };
 
 export default function StoreManager() {
