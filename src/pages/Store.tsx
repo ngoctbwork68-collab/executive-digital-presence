@@ -156,6 +156,11 @@ export default function Store() {
                       <Badge className="absolute top-3 right-3" variant="secondary">
                         {typeLabels[product.product_type] || product.product_type}
                       </Badge>
+                      {product.featured && (
+                        <div className="absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 rounded-full bg-primary/90 text-primary-foreground text-[10px] font-semibold uppercase tracking-wider backdrop-blur">
+                          <Sparkles size={10} /> Nổi bật
+                        </div>
+                      )}
                     </div>
                     <CardContent className="p-4">
                       {product.brand && (
@@ -164,6 +169,21 @@ export default function Store() {
                       <h3 className="font-semibold text-sm line-clamp-2 mb-2 group-hover:text-primary transition-colors">
                         {product.name}
                       </h3>
+
+                      {(product.product_type === 'course' || product.product_type === 'ebook') && (
+                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground mb-2">
+                          {product.instructor && (
+                            <span className="flex items-center gap-1"><User size={11} />{product.instructor}</span>
+                          )}
+                          {product.duration && (
+                            <span className="flex items-center gap-1"><Clock size={11} />{product.duration}</span>
+                          )}
+                          {product.level && (
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">{product.level}</Badge>
+                          )}
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-2">
                         {product.discount_percent && product.discount_percent > 0 ? (
                           <>
@@ -176,6 +196,9 @@ export default function Store() {
                           </>
                         ) : (
                           <span className="font-bold text-primary">{formatPrice(product.price)}</span>
+                        )}
+                        {product.external_url && product.product_type !== 'product' && (
+                          <ExternalLink size={12} className="ml-auto text-muted-foreground" />
                         )}
                       </div>
                       {product.stock_quantity <= 0 && product.product_type === 'product' && (
