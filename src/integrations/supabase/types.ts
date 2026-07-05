@@ -654,6 +654,7 @@ export type Database = {
           customer_phone: string
           delivery_time: string | null
           id: string
+          payment_status: string
           status: string
           total_amount: number
           updated_at: string | null
@@ -667,6 +668,7 @@ export type Database = {
           customer_phone: string
           delivery_time?: string | null
           id?: string
+          payment_status?: string
           status?: string
           total_amount: number
           updated_at?: string | null
@@ -680,6 +682,7 @@ export type Database = {
           customer_phone?: string
           delivery_time?: string | null
           id?: string
+          payment_status?: string
           status?: string
           total_amount?: number
           updated_at?: string | null

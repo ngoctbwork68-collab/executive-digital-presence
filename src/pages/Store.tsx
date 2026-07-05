@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, ShoppingBag, BookOpen, FileText, Package, Filter, Clock, User, Sparkles, ExternalLink } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { usePageSeo } from '@/hooks/usePageSeo';
 
 const PRODUCT_TYPES = [
   { value: '', label: { en: 'All', vi: 'Tất cả' }, icon: Filter },
@@ -51,6 +52,30 @@ export default function Store() {
     discount ? price * (1 - discount / 100) : price;
 
   const typeLabels: Record<string, string> = { product: 'Vật phẩm', course: 'Khóa học', ebook: 'Tài liệu' };
+
+  const seoTitle = language === 'en' ? 'Store — Products, Courses & Resources' : 'Cửa hàng — Sản phẩm, Khóa học & Tài liệu';
+  const seoDesc = language === 'en'
+    ? 'Browse curated products, online courses and downloadable ebooks. Instant access, secure checkout via VietQR.'
+    : 'Khám phá sản phẩm tuyển chọn, khóa học trực tuyến và tài liệu tải về. Truy cập tức thì, thanh toán VietQR an toàn.';
+  usePageSeo({
+    title: seoTitle,
+    description: seoDesc,
+    canonical: '/store',
+    type: 'website',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: seoTitle,
+      description: seoDesc,
+      hasPart: (filtered || []).slice(0, 20).map(p => ({
+        '@type': 'Product',
+        name: p.name,
+        url: `${typeof window !== 'undefined' ? window.location.origin : ''}/store/${p.slug || p.id}`,
+        image: p.image_url || undefined,
+        offers: { '@type': 'Offer', price: p.price, priceCurrency: 'VND' },
+      })),
+    },
+  });
 
   return (
     <div className="min-h-screen bg-background">

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { ShoppingBag, Eye, Phone, MapPin, Calendar, MessageSquare } from 'lucide-react';
+import { ShoppingBag, Eye, Phone, MapPin, Calendar, MessageSquare, CreditCard } from 'lucide-react';
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: 'Chờ xử lý', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200' },
@@ -16,11 +16,19 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   cancelled: { label: 'Đã hủy', color: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200' },
 };
 
+const paymentConfig: Record<string, { label: string; color: string }> = {
+  pending: { label: 'Chưa thanh toán', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200' },
+  paid: { label: 'Đã thanh toán', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200' },
+  refunded: { label: 'Đã hoàn tiền', color: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200' },
+  failed: { label: 'Thất bại', color: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200' },
+};
+
 const fmtVND = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + 'đ';
 
 export default function OrdersManager() {
   const qc = useQueryClient();
   const [filter, setFilter] = useState<string>('all');
+  const [payFilter, setPayFilter] = useState<string>('all');
   const [selected, setSelected] = useState<any>(null);
 
   const { data: orders = [], isLoading } = useQuery({
@@ -35,7 +43,11 @@ export default function OrdersManager() {
     },
   });
 
-  const filtered = filter === 'all' ? orders : orders.filter((o: any) => o.status === filter);
+  const filtered = orders.filter((o: any) => {
+    if (filter !== 'all' && o.status !== filter) return false;
+    if (payFilter !== 'all' && (o.payment_status || 'pending') !== payFilter) return false;
+    return true;
+  });
 
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from('orders').update({ status }).eq('id', id);
@@ -45,8 +57,21 @@ export default function OrdersManager() {
     if (selected?.id === id) setSelected({ ...selected, status });
   };
 
+  const updatePayment = async (id: string, payment_status: string) => {
+    const { error } = await supabase.from('orders').update({ payment_status } as any).eq('id', id);
+    if (error) return toast.error(error.message);
+    toast.success('Cập nhật thanh toán');
+    qc.invalidateQueries({ queryKey: ['admin_orders'] });
+    if (selected?.id === id) setSelected({ ...selected, payment_status });
+  };
+
   const counts = orders.reduce((acc: Record<string, number>, o: any) => {
     acc[o.status] = (acc[o.status] || 0) + 1;
+    return acc;
+  }, {});
+  const payCounts = orders.reduce((acc: Record<string, number>, o: any) => {
+    const k = o.payment_status || 'pending';
+    acc[k] = (acc[k] || 0) + 1;
     return acc;
   }, {});
 
@@ -57,15 +82,33 @@ export default function OrdersManager() {
         <p className="text-sm text-muted-foreground">Quản lý đơn hàng từ cửa hàng</p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <Button variant={filter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setFilter('all')}>
-          Tất cả ({orders.length})
-        </Button>
-        {Object.entries(statusConfig).map(([key, cfg]) => (
-          <Button key={key} variant={filter === key ? 'default' : 'outline'} size="sm" onClick={() => setFilter(key)}>
-            {cfg.label} ({counts[key] || 0})
-          </Button>
-        ))}
+      <div className="space-y-3">
+        <div>
+          <p className="text-xs font-medium text-muted-foreground mb-1.5">Trạng thái đơn</p>
+          <div className="flex flex-wrap gap-2">
+            <Button variant={filter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setFilter('all')}>
+              Tất cả ({orders.length})
+            </Button>
+            {Object.entries(statusConfig).map(([key, cfg]) => (
+              <Button key={key} variant={filter === key ? 'default' : 'outline'} size="sm" onClick={() => setFilter(key)}>
+                {cfg.label} ({counts[key] || 0})
+              </Button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1"><CreditCard className="w-3 h-3" />Thanh toán</p>
+          <div className="flex flex-wrap gap-2">
+            <Button variant={payFilter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setPayFilter('all')}>
+              Tất cả
+            </Button>
+            {Object.entries(paymentConfig).map(([key, cfg]) => (
+              <Button key={key} variant={payFilter === key ? 'default' : 'outline'} size="sm" onClick={() => setPayFilter(key)}>
+                {cfg.label} ({payCounts[key] || 0})
+              </Button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {isLoading ? (
@@ -81,9 +124,12 @@ export default function OrdersManager() {
             <Card key={o.id} className="hover:shadow-md transition">
               <CardContent className="p-4 flex flex-wrap items-center gap-4">
                 <div className="flex-1 min-w-[200px]">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <p className="font-semibold">{o.customer_name}</p>
                     <Badge className={statusConfig[o.status]?.color || ''}>{statusConfig[o.status]?.label || o.status}</Badge>
+                    <Badge variant="outline" className={paymentConfig[o.payment_status || 'pending']?.color || ''}>
+                      {paymentConfig[o.payment_status || 'pending']?.label || o.payment_status}
+                    </Badge>
                   </div>
                   <p className="text-xs text-muted-foreground flex items-center gap-3">
                     <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{o.customer_phone}</span>
@@ -160,6 +206,17 @@ export default function OrdersManager() {
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(statusConfig).map(([key, cfg]) => (
                       <Button key={key} size="sm" variant={selected.status === key ? 'default' : 'outline'} onClick={() => updateStatus(selected.id, key)}>
+                        {cfg.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold mb-2 flex items-center gap-1.5"><CreditCard className="w-4 h-4" />Trạng thái thanh toán</p>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(paymentConfig).map(([key, cfg]) => (
+                      <Button key={key} size="sm" variant={(selected.payment_status || 'pending') === key ? 'default' : 'outline'} onClick={() => updatePayment(selected.id, key)}>
                         {cfg.label}
                       </Button>
                     ))}
