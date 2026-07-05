@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, ShoppingBag, BookOpen, FileText, Package, Filter, Clock, User, Sparkles, ExternalLink } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { usePageSeo } from '@/hooks/usePageSeo';
 
 const PRODUCT_TYPES = [
   { value: '', label: { en: 'All', vi: 'Tất cả' }, icon: Filter },
