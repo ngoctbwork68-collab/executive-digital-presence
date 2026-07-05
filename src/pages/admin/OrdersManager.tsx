@@ -82,15 +82,33 @@ export default function OrdersManager() {
         <p className="text-sm text-muted-foreground">Quản lý đơn hàng từ cửa hàng</p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <Button variant={filter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setFilter('all')}>
-          Tất cả ({orders.length})
-        </Button>
-        {Object.entries(statusConfig).map(([key, cfg]) => (
-          <Button key={key} variant={filter === key ? 'default' : 'outline'} size="sm" onClick={() => setFilter(key)}>
-            {cfg.label} ({counts[key] || 0})
-          </Button>
-        ))}
+      <div className="space-y-3">
+        <div>
+          <p className="text-xs font-medium text-muted-foreground mb-1.5">Trạng thái đơn</p>
+          <div className="flex flex-wrap gap-2">
+            <Button variant={filter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setFilter('all')}>
+              Tất cả ({orders.length})
+            </Button>
+            {Object.entries(statusConfig).map(([key, cfg]) => (
+              <Button key={key} variant={filter === key ? 'default' : 'outline'} size="sm" onClick={() => setFilter(key)}>
+                {cfg.label} ({counts[key] || 0})
+              </Button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1"><CreditCard className="w-3 h-3" />Thanh toán</p>
+          <div className="flex flex-wrap gap-2">
+            <Button variant={payFilter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setPayFilter('all')}>
+              Tất cả
+            </Button>
+            {Object.entries(paymentConfig).map(([key, cfg]) => (
+              <Button key={key} variant={payFilter === key ? 'default' : 'outline'} size="sm" onClick={() => setPayFilter(key)}>
+                {cfg.label} ({payCounts[key] || 0})
+              </Button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {isLoading ? (
