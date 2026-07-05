@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { ShoppingBag, Eye, Phone, MapPin, Calendar, MessageSquare } from 'lucide-react';
+import { ShoppingBag, Eye, Phone, MapPin, Calendar, MessageSquare, CreditCard } from 'lucide-react';
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: 'Chờ xử lý', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200' },
@@ -14,6 +14,13 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   shipping: { label: 'Đang giao', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200' },
   completed: { label: 'Hoàn thành', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200' },
   cancelled: { label: 'Đã hủy', color: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200' },
+};
+
+const paymentConfig: Record<string, { label: string; color: string }> = {
+  pending: { label: 'Chưa thanh toán', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200' },
+  paid: { label: 'Đã thanh toán', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200' },
+  refunded: { label: 'Đã hoàn tiền', color: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200' },
+  failed: { label: 'Thất bại', color: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200' },
 };
 
 const fmtVND = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + 'đ';
