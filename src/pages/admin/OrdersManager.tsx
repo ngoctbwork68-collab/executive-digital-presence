@@ -211,6 +211,17 @@ export default function OrdersManager() {
                     ))}
                   </div>
                 </div>
+
+                <div>
+                  <p className="text-sm font-semibold mb-2 flex items-center gap-1.5"><CreditCard className="w-4 h-4" />Trạng thái thanh toán</p>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(paymentConfig).map(([key, cfg]) => (
+                      <Button key={key} size="sm" variant={(selected.payment_status || 'pending') === key ? 'default' : 'outline'} onClick={() => updatePayment(selected.id, key)}>
+                        {cfg.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </>
           )}
