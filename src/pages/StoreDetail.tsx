@@ -41,6 +41,41 @@ export default function StoreDetail() {
   const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null);
   const [voucherLoading, setVoucherLoading] = useState(false);
 
+  const seoPrice = product ? (product.discount_percent ? product.price * (1 - product.discount_percent / 100) : product.price) : 0;
+  const isCourse = product?.product_type === 'course';
+  const productJsonLd = product ? {
+    '@context': 'https://schema.org',
+    '@type': isCourse ? 'Course' : 'Product',
+    name: product.name,
+    description: (product.description || '').slice(0, 300),
+    image: product.image_url || product.images?.[0] || undefined,
+    ...(isCourse
+      ? {
+          provider: { '@type': 'Organization', name: product.instructor || 'Bao Ngoc Tran' },
+          ...(product.duration ? { timeRequired: product.duration } : {}),
+          offers: { '@type': 'Offer', price: seoPrice, priceCurrency: 'VND', availability: 'https://schema.org/InStock', url: typeof window !== 'undefined' ? window.location.href : '' },
+        }
+      : {
+          brand: product.brand ? { '@type': 'Brand', name: product.brand } : undefined,
+          offers: {
+            '@type': 'Offer',
+            price: seoPrice,
+            priceCurrency: 'VND',
+            availability: (product.stock_quantity ?? 0) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            url: typeof window !== 'undefined' ? window.location.href : '',
+          },
+        }),
+  } : undefined;
+
+  usePageSeo({
+    title: product ? `${product.name} — ${language === 'en' ? 'Store' : 'Cửa hàng'}` : (language === 'en' ? 'Product' : 'Sản phẩm'),
+    description: product?.description || undefined,
+    image: product?.image_url || product?.images?.[0] || undefined,
+    canonical: `/store/${slug}`,
+    type: 'product',
+    jsonLd: productJsonLd,
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
