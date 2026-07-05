@@ -124,9 +124,12 @@ export default function OrdersManager() {
             <Card key={o.id} className="hover:shadow-md transition">
               <CardContent className="p-4 flex flex-wrap items-center gap-4">
                 <div className="flex-1 min-w-[200px]">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <p className="font-semibold">{o.customer_name}</p>
                     <Badge className={statusConfig[o.status]?.color || ''}>{statusConfig[o.status]?.label || o.status}</Badge>
+                    <Badge variant="outline" className={paymentConfig[o.payment_status || 'pending']?.color || ''}>
+                      {paymentConfig[o.payment_status || 'pending']?.label || o.payment_status}
+                    </Badge>
                   </div>
                   <p className="text-xs text-muted-foreground flex items-center gap-3">
                     <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{o.customer_phone}</span>
