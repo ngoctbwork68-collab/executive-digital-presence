@@ -16,6 +16,7 @@ import { ArrowLeft, ShoppingBag, Package, BookOpen, FileText, QrCode, Copy, Chec
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import RichContent from '@/components/RichContent';
 import { toast } from 'sonner';
+import { usePageSeo } from '@/hooks/usePageSeo';
 
 export default function StoreDetail() {
   const { slug } = useParams<{ slug: string }>();
