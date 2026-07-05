@@ -28,6 +28,7 @@ const fmtVND = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + 'đ';
 export default function OrdersManager() {
   const qc = useQueryClient();
   const [filter, setFilter] = useState<string>('all');
+  const [payFilter, setPayFilter] = useState<string>('all');
   const [selected, setSelected] = useState<any>(null);
 
   const { data: orders = [], isLoading } = useQuery({
@@ -42,7 +43,11 @@ export default function OrdersManager() {
     },
   });
 
-  const filtered = filter === 'all' ? orders : orders.filter((o: any) => o.status === filter);
+  const filtered = orders.filter((o: any) => {
+    if (filter !== 'all' && o.status !== filter) return false;
+    if (payFilter !== 'all' && (o.payment_status || 'pending') !== payFilter) return false;
+    return true;
+  });
 
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from('orders').update({ status }).eq('id', id);
@@ -52,8 +57,21 @@ export default function OrdersManager() {
     if (selected?.id === id) setSelected({ ...selected, status });
   };
 
+  const updatePayment = async (id: string, payment_status: string) => {
+    const { error } = await supabase.from('orders').update({ payment_status } as any).eq('id', id);
+    if (error) return toast.error(error.message);
+    toast.success('Cập nhật thanh toán');
+    qc.invalidateQueries({ queryKey: ['admin_orders'] });
+    if (selected?.id === id) setSelected({ ...selected, payment_status });
+  };
+
   const counts = orders.reduce((acc: Record<string, number>, o: any) => {
     acc[o.status] = (acc[o.status] || 0) + 1;
+    return acc;
+  }, {});
+  const payCounts = orders.reduce((acc: Record<string, number>, o: any) => {
+    const k = o.payment_status || 'pending';
+    acc[k] = (acc[k] || 0) + 1;
     return acc;
   }, {});
 
