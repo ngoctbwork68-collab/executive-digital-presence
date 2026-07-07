@@ -240,9 +240,24 @@ const Contact = () => {
 
       {/* Map */}
       {(() => {
-        const raw = contact?.map_embed_url || '';
-        const match = raw.match(/<iframe[^>]*\ssrc=["']([^"']+)["']/i);
-        const mapSrc = match ? match[1] : (raw && /^https?:\/\//.test(raw) ? raw : "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d476855.7336670022!2d105.3230731579968!3d20.975176246258698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab9bd9861ca1%3A0xe7887f7b72ca17a9!2zSMOgIE7hu5lpLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1777937845356!5m2!1svi!2s");
+        const FALLBACK = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d476855.7336670022!2d105.3230731579968!3d20.975176246258698!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ab9bd9861ca1%3A0xe7887f7b72ca17a9!2zSMOgIE7hu5lpLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2s!4v1777937845356!5m2!1svi!2s";
+        const raw = (contact?.map_embed_url || '').trim();
+        // Decode common HTML entities so pasted iframe HTML parses correctly
+        const decoded = raw
+          .replace(/&quot;/g, '"')
+          .replace(/&#34;/g, '"')
+          .replace(/&#39;/g, "'")
+          .replace(/&apos;/g, "'")
+          .replace(/&amp;/g, '&');
+        // Find the LAST src="..." in case user pasted nested iframe HTML
+        let mapSrc = FALLBACK;
+        const matches = [...decoded.matchAll(/src\s*=\s*["']([^"']+)["']/gi)];
+        if (matches.length) {
+          const candidate = matches[matches.length - 1][1];
+          if (/^https:\/\/(www\.)?google\.com\/maps\/embed/i.test(candidate)) mapSrc = candidate;
+        } else if (/^https:\/\/(www\.)?google\.com\/maps\/embed/i.test(decoded)) {
+          mapSrc = decoded;
+        }
         return (
           <section className="container mx-auto px-4 pb-16">
             <div className="max-w-5xl mx-auto rounded-2xl overflow-hidden shadow-lg">
@@ -260,6 +275,7 @@ const Contact = () => {
           </section>
         );
       })()}
+
 
       <CustomSections page="contact" />
       <Footer />
