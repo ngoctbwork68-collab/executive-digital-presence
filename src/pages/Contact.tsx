@@ -17,6 +17,42 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BookingForm from '@/components/BookingForm';
 import { safeMapEmbedUrl, FALLBACK_MAP_EMBED } from '@/lib/mapEmbed';
 
+const MapEmbed = ({ raw }: { raw?: string | null }) => {
+  const primary = safeMapEmbedUrl(raw);
+  const [src, setSrc] = useState(primary);
+  const [failed, setFailed] = useState(false);
+  return (
+    <section className="container mx-auto px-4 pb-16">
+      <div className="max-w-5xl mx-auto rounded-2xl overflow-hidden shadow-lg relative">
+        <iframe
+          key={src}
+          src={src}
+          width="100%"
+          height="450"
+          style={{ border: 0 }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Location Map"
+          onError={() => {
+            if (src !== FALLBACK_MAP_EMBED) {
+              setSrc(FALLBACK_MAP_EMBED);
+              setFailed(true);
+            }
+          }}
+        />
+        {failed && (
+          <div className="absolute top-2 right-2 text-xs bg-background/90 border rounded-md px-2 py-1 text-muted-foreground">
+            Đang hiển thị bản đồ mặc định
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
+
+
 
 const Contact = () => {
   const { language } = useLanguage();
