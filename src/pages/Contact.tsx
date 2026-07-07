@@ -15,6 +15,8 @@ import { Mail, MapPin, Linkedin, Github, Twitter, Phone, Send, MessageSquare, Ca
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BookingForm from '@/components/BookingForm';
+import { safeMapEmbedUrl, FALLBACK_MAP_EMBED } from '@/lib/mapEmbed';
+
 
 const Contact = () => {
   const { language } = useLanguage();
