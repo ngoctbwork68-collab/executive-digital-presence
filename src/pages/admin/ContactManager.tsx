@@ -345,10 +345,21 @@ export default function ContactManager() {
                   </Label>
                   <Input
                     value={contactForm.map_embed_url}
-                    onChange={(e) => setContactForm(prev => ({ ...prev, map_embed_url: e.target.value }))}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      // Auto-extract src if user pastes full <iframe ...> HTML
+                      const decoded = val.replace(/&quot;/g, '"').replace(/&#34;/g, '"').replace(/&amp;/g, '&');
+                      const m = decoded.match(/src\s*=\s*["']([^"']+)["']/i);
+                      const clean = m ? m[1] : val;
+                      setContactForm(prev => ({ ...prev, map_embed_url: clean }));
+                    }}
                     placeholder="https://www.google.com/maps/embed?pb=..."
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Dán URL bắt đầu bằng <code>https://www.google.com/maps/embed?pb=...</code>. Nếu dán cả thẻ <code>&lt;iframe&gt;</code>, hệ thống sẽ tự trích xuất URL.
+                  </p>
                 </div>
+
               </div>
 
               <div className="flex justify-end pt-2">
