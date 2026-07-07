@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { extractMapEmbedUrl } from '@/lib/mapEmbed';
+
 
 interface ContactSubmission {
   id: string;
