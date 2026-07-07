@@ -349,17 +349,20 @@ export default function ContactManager() {
                     value={contactForm.map_embed_url}
                     onChange={(e) => {
                       const val = e.target.value;
-                      // Auto-extract src if user pastes full <iframe ...> HTML
-                      const decoded = val.replace(/&quot;/g, '"').replace(/&#34;/g, '"').replace(/&amp;/g, '&');
-                      const m = decoded.match(/src\s*=\s*["']([^"']+)["']/i);
-                      const clean = m ? m[1] : val;
-                      setContactForm(prev => ({ ...prev, map_embed_url: clean }));
+                      // Try to auto-clean while typing; if not a valid embed yet, keep raw input
+                      const clean = extractMapEmbedUrl(val);
+                      setContactForm(prev => ({ ...prev, map_embed_url: clean ?? val }));
+                    }}
+                    onBlur={(e) => {
+                      const clean = extractMapEmbedUrl(e.target.value);
+                      if (clean) setContactForm(prev => ({ ...prev, map_embed_url: clean }));
                     }}
                     placeholder="https://www.google.com/maps/embed?pb=..."
                   />
                   <p className="text-xs text-muted-foreground">
-                    Dán URL bắt đầu bằng <code>https://www.google.com/maps/embed?pb=...</code>. Nếu dán cả thẻ <code>&lt;iframe&gt;</code>, hệ thống sẽ tự trích xuất URL.
+                    Dán URL bắt đầu bằng <code>https://www.google.com/maps/embed?pb=...</code>. Nếu dán cả thẻ <code>&lt;iframe&gt;</code> (kể cả có HTML entities), hệ thống sẽ tự trích xuất URL sạch khi bạn rời khỏi ô. Giá trị không hợp lệ sẽ tự chuyển về bản đồ mặc định trên trang /contact.
                   </p>
+
                 </div>
 
               </div>
