@@ -289,3 +289,82 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   BỘ GIAO DIỆN (DESIGN PRESETS) — chọn trong /admin/design
+   Chỉ áp dụng cho trang công khai (body:not(.is-admin))
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── Kiến trúc tối giản (architect) ─── */
+[data-design-preset="architect"] body:not(.is-admin) h1,
+[data-design-preset="architect"] body:not(.is-admin) h2,
+[data-design-preset="architect"] body:not(.is-admin) h3 {
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+[data-design-preset="architect"] body:not(.is-admin) h1 { font-weight: 300; }
+[data-design-preset="architect"] body:not(.is-admin) [class*="rounded-"] {
+  border-radius: 0 !important;
+}
+[data-design-preset="architect"] body:not(.is-admin) [class*="rounded-full"] {
+  border-radius: 9999px !important;
+}
+[data-design-preset="architect"] body:not(.is-admin) [class*="shadow-"] {
+  box-shadow: none !important;
+}
+[data-design-preset="architect"] body:not(.is-admin) .card-premium,
+[data-design-preset="architect"] body:not(.is-admin) [class*="bg-card"] {
+  border: 1px solid hsl(var(--accent) / 0.25);
+}
+[data-design-preset="architect"] body:not(.is-admin) .card-premium:hover {
+  transform: none;
+  border-color: hsl(var(--accent) / 0.6);
+}
+
+/* ─── Niên giám xa xỉ (archival) ─── */
+[data-design-preset="archival"] body:not(.is-admin) h1,
+[data-design-preset="archival"] body:not(.is-admin) h2 {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+[data-design-preset="archival"] body:not(.is-admin) h3,
+[data-design-preset="archival"] body:not(.is-admin) h4 {
+  font-style: italic;
+}
+[data-design-preset="archival"] body:not(.is-admin) [class*="uppercase"] {
+  letter-spacing: 0.28em;
+}
+[data-design-preset="archival"] body:not(.is-admin) [class*="rounded-2xl"],
+[data-design-preset="archival"] body:not(.is-admin) [class*="rounded-xl"],
+[data-design-preset="archival"] body:not(.is-admin) [class*="rounded-lg"] {
+  border-radius: 2px !important;
+}
+[data-design-preset="archival"] body:not(.is-admin) [class*="bg-card"] {
+  border: 1px solid hsl(var(--accent) / 0.18);
+  box-shadow: 0 24px 60px -40px hsl(var(--primary) / 0.55);
+}
+
+/* ─── Tạp chí điều hành (editorial) ─── */
+[data-design-preset="editorial"] body:not(.is-admin) h1,
+[data-design-preset="editorial"] body:not(.is-admin) h2 {
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+[data-design-preset="editorial"] body:not(.is-admin) section + section {
+  border-top: 1px solid hsl(var(--foreground) / 0.08);
+}
+[data-design-preset="editorial"] body:not(.is-admin) [class*="rounded-2xl"],
+[data-design-preset="editorial"] body:not(.is-admin) [class*="rounded-xl"] {
+  border-radius: 4px !important;
+}
+[data-design-preset="editorial"] body:not(.is-admin) [class*="shadow-xl"],
+[data-design-preset="editorial"] body:not(.is-admin) [class*="shadow-2xl"] {
+  box-shadow: 0 18px 50px -34px hsl(var(--primary) / 0.5) !important;
+}
+[data-design-preset="editorial"] body:not(.is-admin) img {
+  filter: grayscale(0.85);
+  transition: filter 0.7s ease;
+}
+[data-design-preset="editorial"] body:not(.is-admin) img:hover {
+  filter: grayscale(0);
+}
