@@ -14,11 +14,11 @@ import { cn } from '@/lib/utils';
 import {
   Mail, Phone, MapPin, Save, Inbox, Eye, EyeOff, Trash2,
   Clock, User, MessageSquare, Search, CheckCircle2, Circle,
-  ChevronRight, Globe, ExternalLink, X, Settings2, AlertCircle
+  ChevronRight, Globe, ExternalLink, X, Settings2, AlertCircle, AlertTriangle
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { extractMapEmbedUrl } from '@/lib/mapEmbed';
+import { extractMapEmbedUrl, safeMapEmbedUrl } from '@/lib/mapEmbed';
 
 
 interface ContactSubmission {
@@ -363,7 +363,50 @@ export default function ContactManager() {
                     Dán URL bắt đầu bằng <code>https://www.google.com/maps/embed?pb=...</code>. Nếu dán cả thẻ <code>&lt;iframe&gt;</code> (kể cả có HTML entities), hệ thống sẽ tự trích xuất URL sạch khi bạn rời khỏi ô. Giá trị không hợp lệ sẽ tự chuyển về bản đồ mặc định trên trang /contact.
                   </p>
 
+                  {/* Live preview */}
+                  {(() => {
+                    const raw = contactForm.map_embed_url;
+                    const clean = extractMapEmbedUrl(raw);
+                    const isEmpty = !raw?.trim();
+                    const previewSrc = safeMapEmbedUrl(raw);
+                    const usingFallback = !clean;
+                    return (
+                      <div className="space-y-2 pt-1">
+                        <div className="flex items-center gap-2">
+                          {isEmpty ? (
+                            <Badge variant="secondary" className="gap-1">
+                              <AlertTriangle size={12} /> Chưa nhập — dùng bản đồ mặc định
+                            </Badge>
+                          ) : usingFallback ? (
+                            <Badge variant="destructive" className="gap-1">
+                              <AlertTriangle size={12} /> URL không hợp lệ — đang dùng fallback
+                            </Badge>
+                          ) : (
+                            <Badge className="gap-1">
+                              <CheckCircle2 size={12} /> URL hợp lệ
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="rounded-xl overflow-hidden border border-border">
+                          <iframe
+                            key={previewSrc}
+                            src={previewSrc}
+                            width="100%"
+                            height="260"
+                            style={{ border: 0 }}
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            title="Xem trước bản đồ"
+                          />
+                        </div>
+                        <p className="text-[11px] text-muted-foreground break-all">
+                          Preview: {previewSrc}
+                        </p>
+                      </div>
+                    );
+                  })()}
                 </div>
+
 
               </div>
 
