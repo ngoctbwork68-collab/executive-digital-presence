@@ -14,6 +14,7 @@ import FaviconUpdater from "./components/FaviconUpdater";
 import ColorThemeApplier from "./components/ColorThemeApplier";
 import FontThemeApplier from "./components/FontThemeApplier";
 import ScrollToTop from "./components/ScrollToTop";
+import DesignPresetApplier from "./components/DesignPresetApplier";
 import SeoApplier from "./components/SeoApplier";
 import KeepAlivePinger from "./components/KeepAlivePinger";
 
@@ -58,6 +59,7 @@ const SectionsOrderManager = lazy(() => import("./pages/admin/SectionsOrderManag
 const BookingsManager = lazy(() => import("./pages/admin/BookingsManager"));
 const LoadingScreenManager = lazy(() => import("./pages/admin/LoadingScreenManager"));
 const SeoManager = lazy(() => import("./pages/admin/SeoManager"));
+const DesignManager = lazy(() => import("./pages/admin/DesignManager"));
 
 // Stale-While-Revalidate:
 // - Dữ liệu local từ localStorage persister được hiển thị TỨC THÌ.
@@ -160,6 +162,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <ScrollToTop />
+        <DesignPresetApplier />
         <SeoApplier />
         <KeepAlivePinger />
         <Suspense fallback={<PageFallback />}>
@@ -200,6 +203,7 @@ const App = () => (
               <Route path="bookings" element={<BookingsManager />} />
               <Route path="loading-screen" element={<LoadingScreenManager />} />
               <Route path="seo" element={<SeoManager />} />
+              <Route path="design" element={<DesignManager />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

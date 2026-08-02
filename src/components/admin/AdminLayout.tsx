@@ -8,7 +8,7 @@ import {
   User, Briefcase, FolderOpen, Activity, FileText,
   Image, Settings, LogOut, LayoutDashboard, GraduationCap,
   Sun, Moon, Menu, X, ChevronRight, Blocks, ShoppingBag, Ticket, Quote, MessageCircle, BookOpen,
-  Sparkles, Package, Tags, Bot, LayoutGrid, CalendarDays, Loader2, Search
+  Sparkles, Package, Tags, Bot, LayoutGrid, CalendarDays, Loader2, Search, Palette
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -53,6 +53,7 @@ const menuGroups = [
       { path: '/admin/media', icon: Image, label: 'Thư viện' },
       { path: '/admin/loading-screen', icon: Loader2, label: 'Trang Loading' },
       { path: '/admin/seo', icon: Search, label: 'SEO & Keep-alive' },
+      { path: '/admin/design', icon: Palette, label: 'Bộ giao diện' },
       { path: '/admin/settings', icon: Settings, label: 'Cài đặt' },
     ],
   },

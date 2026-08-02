@@ -2,8 +2,11 @@ import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { applyFontTheme } from '@/lib/fontThemes';
+import { useDesignPreset } from '@/hooks/useDesignPreset';
 
 const FontThemeApplier = () => {
+  const preset = useDesignPreset();
+
   const { data: fontThemeId } = useQuery({
     queryKey: ['settings', 'font_theme'],
     queryFn: async () => {
@@ -18,10 +21,13 @@ const FontThemeApplier = () => {
   });
 
   useEffect(() => {
+    // Preset có bộ font riêng -> để applyDesignPreset xử lý
+    if (preset.fonts) return;
     if (fontThemeId) {
       applyFontTheme(fontThemeId);
     }
-  }, [fontThemeId]);
+  }, [fontThemeId, preset]);
+
 
   return null;
 };
