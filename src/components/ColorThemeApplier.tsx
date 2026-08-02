@@ -3,9 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { applyColorTheme, type CustomColors } from '@/lib/colorThemes';
 import { useTheme } from '@/lib/theme';
+import { useDesignPreset } from '@/hooks/useDesignPreset';
 
 const ColorThemeApplier = () => {
   const { theme: darkMode } = useTheme();
+  const preset = useDesignPreset();
+
 
   const { data: colorThemeId } = useQuery({
     queryKey: ['settings', 'color_theme'],
@@ -35,6 +38,11 @@ const ColorThemeApplier = () => {
   });
 
   useEffect(() => {
+    // Bộ giao diện (design preset) có bảng màu riêng thì ưu tiên nó
+    if (preset.colors) {
+      applyColorTheme('custom', darkMode === 'dark', preset.colors);
+      return;
+    }
     if (!colorThemeId) return;
     let customColors: CustomColors | undefined;
     if (colorThemeId === 'custom' && customColorsRaw) {
@@ -43,7 +51,8 @@ const ColorThemeApplier = () => {
       } catch { /* ignore */ }
     }
     applyColorTheme(colorThemeId, darkMode === 'dark', customColors);
-  }, [colorThemeId, darkMode, customColorsRaw]);
+  }, [colorThemeId, darkMode, customColorsRaw, preset]);
+
 
   return null;
 };
