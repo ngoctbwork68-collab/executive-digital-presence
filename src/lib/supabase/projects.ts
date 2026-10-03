@@ -10,6 +10,7 @@ export const projectsAPI = {
     const { data, error } = await supabase
       .from('projects')
       .select('*')
+      .eq('published' as never, true as never)
       .order('sort_order', { ascending: true });
     
     if (error) throw error;
@@ -21,6 +22,7 @@ export const projectsAPI = {
       .from('projects')
       .select('*')
       .eq('featured', true)
+      .eq('published' as never, true as never)
       .order('sort_order', { ascending: true })
       .limit(limit);
     
@@ -90,6 +92,10 @@ export const projectsAPI = {
       .eq('id', id);
     
     if (error) throw error;
+  },
+
+  async togglePublished(id: string, published: boolean) {
+    return this.updateProject(id, { published } as ProjectUpdate);
   },
 
   async toggleFeatured(id: string, featured: boolean) {
