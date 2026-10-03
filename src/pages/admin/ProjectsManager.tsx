@@ -31,7 +31,7 @@ export default function ProjectsManager() {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [formData, setFormData] = useState({
     title: '', slug: '', description: '', category: '', full_description: '', challenge: '', solution: '',
-    image_url: '', link: '', technologies: [] as string[], featured: false, sort_order: 0,
+    image_url: '', link: '', technologies: [] as string[], featured: false, published: true, sort_order: 0,
   });
   const [techInput, setTechInput] = useState('');
   const [localItems, setLocalItems] = useState<Project[]>([]);
@@ -61,13 +61,14 @@ export default function ProjectsManager() {
         challenge: editingProject.challenge || '', solution: editingProject.solution || '',
         image_url: editingProject.image_url || '', link: editingProject.link || '',
         technologies: editingProject.technologies || [], featured: editingProject.featured || false,
+        published: (editingProject as Project & { published?: boolean }).published ?? true,
         sort_order: editingProject.sort_order || 0,
       });
     } else { resetForm(); }
   }, [editingProject]);
 
   const resetForm = () => {
-    setFormData({ title: '', slug: '', description: '', category: '', full_description: '', challenge: '', solution: '', image_url: '', link: '', technologies: [], featured: false, sort_order: 0 });
+    setFormData({ title: '', slug: '', description: '', category: '', full_description: '', challenge: '', solution: '', image_url: '', link: '', technologies: [], featured: false, published: true, sort_order: 0 });
     setTechInput('');
   };
 
@@ -167,6 +168,10 @@ export default function ProjectsManager() {
               </div>
               <div className="flex gap-6">
                 <div className="flex items-center space-x-2">
+                  <Switch checked={formData.published} onCheckedChange={(checked) => setFormData(p => ({ ...p, published: checked }))} />
+                  <Label>Xuất bản</Label>
+                </div>
+                <div className="flex items-center space-x-2">
                   <Switch checked={formData.featured} onCheckedChange={(checked) => setFormData(p => ({ ...p, featured: checked }))} />
                   <Label>Nổi bật</Label>
                 </div>
@@ -188,6 +193,7 @@ export default function ProjectsManager() {
               <TableHead className="w-16">Ảnh</TableHead>
               <TableHead>Tiêu đề</TableHead>
               <TableHead>Danh mục</TableHead>
+              <TableHead>Xuất bản</TableHead>
               <TableHead>Nổi bật</TableHead>
               <TableHead>Thao tác</TableHead>
             </TableRow>
@@ -206,6 +212,9 @@ export default function ProjectsManager() {
                     </TableCell>
                     <TableCell className="font-medium">{project.title}</TableCell>
                     <TableCell>{project.category}</TableCell>
+                    <TableCell>
+                      <Switch checked={(project as Project & { published?: boolean }).published ?? true} onCheckedChange={(c) => updateProject.mutate({ id: project.id, updates: { published: c } as ProjectUpdate })} />
+                    </TableCell>
                     <TableCell>
                       <Switch checked={project.featured || false} onCheckedChange={() => toggleFeatured.mutate({ id: project.id, featured: !project.featured })} />
                     </TableCell>

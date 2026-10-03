@@ -827,6 +827,7 @@ export type Database = {
           image_url: string | null
           link: string | null
           metrics: Json | null
+          published: boolean
           slug: string | null
           solution: string | null
           sort_order: number | null
@@ -845,6 +846,7 @@ export type Database = {
           image_url?: string | null
           link?: string | null
           metrics?: Json | null
+          published?: boolean
           slug?: string | null
           solution?: string | null
           sort_order?: number | null
@@ -863,6 +865,7 @@ export type Database = {
           image_url?: string | null
           link?: string | null
           metrics?: Json | null
+          published?: boolean
           slug?: string | null
           solution?: string | null
           sort_order?: number | null
