@@ -74,21 +74,19 @@ const queryClient = new QueryClient({
       refetchOnMount: "always",      // mount lại → fetch nền, vẫn show cache ngay
       refetchOnReconnect: "always",  // online lại → đồng bộ
       refetchOnWindowFocus: false,   // tránh spam khi switch tab
-      retry: 1,
+      retry: 2,
+      retryDelay: (n) => Math.min(1000 * 2 ** n, 5000),
       structuralSharing: true,       // chỉ đổi reference khi data thực sự khác
-      networkMode: "offlineFirst",   // có cache thì dùng cache, không chờ network
     },
   },
 });
 
-
-// Persist toàn bộ React Query cache vào localStorage để vào lại trang là hiển thị tức thì
-const SNAPSHOT_BUSTER = "v2-2026-06-26"; // bump để xóa snapshot mockup cũ
-const SNAPSHOT_KEY = "app-query-cache-v2";
+// Persist chỉ các query THÀNH CÔNG vào localStorage để vào lại trang hiển thị tức thì.
+const SNAPSHOT_BUSTER = "v3-2026-10-03"; // bump để xóa toàn bộ snapshot cũ
+const SNAPSHOT_KEY = "app-query-cache-v3";
 const SNAPSHOT_VERSION_KEY = "app-query-cache-version";
-const OLD_SNAPSHOT_KEYS = ["app-query-cache-v1", "REACT_QUERY_OFFLINE_CACHE"];
+const OLD_SNAPSHOT_KEYS = ["app-query-cache-v1", "app-query-cache-v2", "REACT_QUERY_OFFLINE_CACHE"];
 
-// Dọn các snapshot cũ (mockup lỗi) ngay khi app khởi động
 if (typeof window !== "undefined") {
   try {
     OLD_SNAPSHOT_KEYS.forEach((k) => localStorage.removeItem(k));
@@ -99,42 +97,17 @@ const persister = typeof window !== "undefined"
   ? createSyncStoragePersister({
       storage: window.localStorage,
       key: SNAPSHOT_KEY,
-      throttleTime: 200,
+      throttleTime: 1000,
     })
   : undefined;
 
-if (typeof window !== "undefined" && persister) {
-  const writeSnapshot = () => {
-    void Promise.resolve(persister.persistClient({
-      buster: SNAPSHOT_BUSTER,
-      timestamp: Date.now(),
-      clientState: {
-        mutations: [],
-        queries: queryClient.getQueryCache().getAll().map((q) => ({
-          queryKey: q.queryKey,
-          queryHash: q.queryHash,
-          state: q.state,
-        })) as never,
-      },
-    })).catch(() => {});
-  };
-
-  // Snapshot ngay khi MỖI query fetch thành công → lần load sau hiện tức thì
-  queryClient.getQueryCache().subscribe((event) => {
-    if (event?.type === "updated" && event.query.state.status === "success") {
-      writeSnapshot();
-    }
-  });
-
-  // Snapshot + bump version sau mỗi mutation thành công (admin chỉnh sửa)
+if (typeof window !== "undefined") {
+  // Admin lưu thay đổi → báo tab khác làm mới
   queryClient.getMutationCache().subscribe((event) => {
     if (event?.type === "updated" && event.mutation?.state.status === "success") {
-      writeSnapshot();
       try { localStorage.setItem(SNAPSHOT_VERSION_KEY, String(Date.now())); } catch {}
     }
   });
-
-  // Tab khác cập nhật → invalidate để hiển thị bản mới
   window.addEventListener("storage", (e) => {
     if (e.key === SNAPSHOT_VERSION_KEY) queryClient.invalidateQueries();
   });
@@ -146,7 +119,14 @@ const Providers = ({ children }: { children: React.ReactNode }) =>
   persister ? (
     <PersistQueryClientProvider
       client={queryClient}
-      persistOptions={{ persister, maxAge: 24 * 60 * 60 * 1000, buster: SNAPSHOT_BUSTER }}
+      persistOptions={{
+        persister,
+        maxAge: 24 * 60 * 60 * 1000,
+        buster: SNAPSHOT_BUSTER,
+        dehydrateOptions: {
+          shouldDehydrateQuery: (q) => q.state.status === "success" && q.state.data !== undefined,
+        },
+      }}
     >
       {children}
     </PersistQueryClientProvider>
