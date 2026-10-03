@@ -45,6 +45,7 @@ export const projectsAPI = {
       .from('projects')
       .select('*')
       .eq('slug', slug)
+      .eq('published' as never, true as never)
       .single();
     
     if (error) throw error;
